@@ -3,20 +3,19 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: TRENDIE MODELS application API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: agency
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +23,961 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /me:
+    get:
+      operationId: getProfile
+      tags: [agency]
+      summary: Get the signed-in user's profile
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgencyProfile"
+    patch:
+      operationId: updateProfile
+      tags: [agency]
+      summary: Update permitted profile details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgencyProfile"
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [agency]
+      summary: Get role-specific dashboard summary
+      responses:
+        "200":
+          description: Dashboard overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /models:
+    get:
+      operationId: listModels
+      tags: [agency]
+      summary: Search and filter model profiles (admin)
+      parameters:
+        - in: query
+          name: search
+          schema: { type: string }
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [pending, approved, rejected, suspended, all]
+      responses:
+        "200":
+          description: Models
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AgencyProfile" }
+  /models/{id}:
+    patch:
+      operationId: updateModelProfile
+      tags: [agency]
+      summary: Update permitted model profile details (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Updated model profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgencyProfile"
+  /models/{id}/suspension:
+    post:
+      operationId: setModelSuspension
+      tags: [agency]
+      summary: Suspend or restore a model account (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModelSuspensionInput"
+      responses:
+        "200":
+          description: Updated model profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgencyProfile"
+  /applications:
+    get:
+      operationId: listApplications
+      tags: [agency]
+      summary: List the current user's application or applications for admin review
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string, enum: [pending, approved, rejected, all] }
+      responses:
+        "200":
+          description: Applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AgencyApplication" }
+    post:
+      operationId: submitApplication
+      tags: [agency]
+      summary: Submit an application for review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationInput"
+      responses:
+        "201":
+          description: Submitted application
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgencyApplication"
+  /applications/{id}/decision:
+    post:
+      operationId: decideApplication
+      tags: [agency]
+      summary: Approve or reject an application (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationDecision"
+      responses:
+        "200":
+          description: Application decision
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgencyApplication"
+  /tasks:
+    get:
+      operationId: listTasks
+      tags: [agency]
+      summary: List tasks visible to the current user
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string, enum: [open, in_progress, submitted, completed, overdue, cancelled, all] }
+      responses:
+        "200":
+          description: Tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AgencyTask" }
+    post:
+      operationId: createTask
+      tags: [agency]
+      summary: Create and assign a task (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskInput"
+      responses:
+        "201":
+          description: Created task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgencyTask"
+  /tasks/{id}:
+    patch:
+      operationId: updateTask
+      tags: [agency]
+      summary: Update or cancel a task (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskUpdate"
+      responses:
+        "200":
+          description: Updated task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgencyTask"
+  /tasks/{id}/submissions:
+    post:
+      operationId: submitTask
+      tags: [agency]
+      summary: Submit task evidence or completion notes
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskSubmissionInput"
+      responses:
+        "201":
+          description: Submission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskSubmission"
+  /submissions/{id}/review:
+    post:
+      operationId: reviewSubmission
+      tags: [agency]
+      summary: Approve or reject a task submission and award points (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmissionReview"
+      responses:
+        "200":
+          description: Reviewed submission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskSubmission"
+  /leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [agency]
+      summary: Get model leaderboard
+      responses:
+        "200":
+          description: Leaderboard
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/LeaderboardEntry" }
+  /points:
+    get:
+      operationId: listPoints
+      tags: [agency]
+      summary: List points transactions visible to the current user
+      responses:
+        "200":
+          description: Points history
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PointsTransaction" }
+    post:
+      operationId: awardPoints
+      tags: [agency]
+      summary: Adjust a model's points (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PointsInput"
+      responses:
+        "201":
+          description: Points transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PointsTransaction"
+  /announcements:
+    get:
+      operationId: listAnnouncements
+      tags: [agency]
+      summary: List published announcements for the current user
+      responses:
+        "200":
+          description: Announcements
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AgencyAnnouncement" }
+    post:
+      operationId: createAnnouncement
+      tags: [agency]
+      summary: Draft or publish an announcement (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnouncementInput"
+      responses:
+        "201":
+          description: Announcement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgencyAnnouncement"
+  /announcements/{id}:
+    patch:
+      operationId: updateAnnouncement
+      tags: [agency]
+      summary: Edit or archive an announcement (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnouncementUpdate"
+      responses:
+        "200":
+          description: Updated announcement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgencyAnnouncement"
+  /announcements/{id}/read:
+    post:
+      operationId: markAnnouncementRead
+      tags: [agency]
+      summary: Mark an announcement as read
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204": { description: Read state saved }
+  /conversations:
+    get:
+      operationId: listConversations
+      tags: [agency]
+      summary: List the current user's private conversations
+      responses:
+        "200":
+          description: Conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AgencyConversation" }
+    post:
+      operationId: createConversation
+      tags: [agency]
+      summary: Start an authorized private conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConversationInput"
+      responses:
+        "201":
+          description: Conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgencyConversation"
+  /conversations/{id}/messages:
+    get:
+      operationId: listMessages
+      tags: [agency]
+      summary: List messages in a conversation the user belongs to
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AgencyMessage" }
+    post:
+      operationId: sendMessage
+      tags: [agency]
+      summary: Send a message to a conversation the user belongs to
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageInput"
+      responses:
+        "201":
+          description: Message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgencyMessage"
+  /notifications:
+    get:
+      operationId: listNotifications
+      tags: [agency]
+      summary: List the current user's notifications
+      responses:
+        "200":
+          description: Notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AgencyNotification" }
+  /notifications/read:
+    post:
+      operationId: markNotificationsRead
+      tags: [agency]
+      summary: Mark selected notifications as read
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationReadInput"
+      responses:
+        "204": { description: Read states saved }
+  /tracker:
+    get:
+      operationId: listDailyEntries
+      tags: [agency]
+      summary: List the signed-in model's private daily tracking records
+      responses:
+        "200":
+          description: Daily records
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/DailyEntry" }
+    post:
+      operationId: saveDailyEntry
+      tags: [agency]
+      summary: Create or update today's private tracking record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DailyEntryInput"
+      responses:
+        "200":
+          description: Daily record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyEntry"
+  /support-requests:
+    get:
+      operationId: listSupportRequests
+      tags: [agency]
+      summary: List support requests visible to the current user
+      responses:
+        "200":
+          description: Support requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/SupportRequest" }
+    post:
+      operationId: createSupportRequest
+      tags: [agency]
+      summary: Submit a support request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupportRequestInput"
+      responses:
+        "201":
+          description: Support request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportRequest"
+  /support-requests/{id}:
+    patch:
+      operationId: updateSupportRequest
+      tags: [agency]
+      summary: Update support request status (admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupportRequestUpdate"
+      responses:
+        "200":
+          description: Updated support request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportRequest"
+  /support-requests/{id}/replies:
+    post:
+      operationId: replyToSupportRequest
+      tags: [agency]
+      summary: Reply to a support request
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupportReplyInput"
+      responses:
+        "201":
+          description: Support reply
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportReply"
+  /audit-logs:
+    get:
+      operationId: listAuditLogs
+      tags: [agency]
+      summary: List audit events (admin)
+      responses:
+        "200":
+          description: Audit log
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AuditEvent" }
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [agency]
+      summary: Get agency-wide administrative statistics
+      responses:
+        "200":
+          description: Administrative statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
 components:
   schemas:
     HealthStatus:
       type: object
       properties:
-        status:
-          type: string
-      required:
-        - status
-
+        status: { type: string }
+      required: [status]
+    AgencyProfile:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        role: { type: string, enum: [model, admin] }
+        full_name: { type: string }
+        phone: { type: ["string", "null"] }
+        date_of_birth: { type: ["string", "null"], format: date }
+        location: { type: ["string", "null"] }
+        height_cm: { type: ["number", "null"] }
+        measurements: { type: object, additionalProperties: true }
+        experience: { type: ["string", "null"] }
+        interests: { type: array, items: { type: string } }
+        biography: { type: ["string", "null"] }
+        profile_photo_path: { type: ["string", "null"] }
+        portfolio_paths: { type: array, items: { type: string } }
+        social_links: { type: object, additionalProperties: { type: string } }
+        application_status: { type: string, enum: [pending, approved, rejected, not_submitted] }
+        review_reason: { type: ["string", "null"] }
+        points: { type: integer }
+        profile_completion: { type: integer }
+        suspended_at: { type: ["string", "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+      required: [id, email, role, full_name, application_status, points, profile_completion, created_at]
+    ProfileUpdate:
+      type: object
+      properties:
+        full_name: { type: string, minLength: 2, maxLength: 120 }
+        phone: { type: ["string", "null"], maxLength: 30 }
+        date_of_birth: { type: ["string", "null"], format: date }
+        location: { type: ["string", "null"], maxLength: 120 }
+        height_cm: { type: ["number", "null"], minimum: 0, maximum: 260 }
+        measurements: { type: object, additionalProperties: true }
+        experience: { type: ["string", "null"], maxLength: 4000 }
+        interests: { type: array, items: { type: string }, maxItems: 20 }
+        biography: { type: ["string", "null"], maxLength: 4000 }
+        profile_photo_path: { type: ["string", "null"], maxLength: 500 }
+        portfolio_paths: { type: array, items: { type: string }, maxItems: 30 }
+        social_links: { type: object, additionalProperties: { type: string } }
+    ModelSuspensionInput:
+      type: object
+      properties:
+        suspended: { type: boolean }
+      required: [suspended]
+      additionalProperties: false
+    AgencyApplication:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        status: { type: string, enum: [pending, approved, rejected] }
+        statement: { type: ["string", "null"] }
+        review_reason: { type: ["string", "null"] }
+        submitted_at: { type: string, format: date-time }
+        reviewed_at: { type: ["string", "null"], format: date-time }
+        applicant: { $ref: "#/components/schemas/AgencyProfile" }
+      required: [id, user_id, status, submitted_at]
+    ApplicationInput:
+      type: object
+      properties:
+        statement: { type: ["string", "null"], maxLength: 2000 }
+      additionalProperties: false
+    ApplicationDecision:
+      type: object
+      properties:
+        status: { type: string, enum: [approved, rejected] }
+        reason: { type: string, minLength: 3, maxLength: 1000 }
+      required: [status, reason]
+      additionalProperties: false
+    AgencyTask:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        description: { type: string }
+        instructions: { type: ["string", "null"] }
+        deadline: { type: ["string", "null"], format: date-time }
+        priority: { type: string, enum: [low, normal, high, urgent] }
+        status: { type: string, enum: [open, in_progress, submitted, completed, overdue, cancelled] }
+        created_at: { type: string, format: date-time }
+        assignment_id: { type: ["string", "null"], format: uuid }
+        assignment_status: { type: ["string", "null"] }
+        submission: { type: ["object", "null"], additionalProperties: true }
+        assignees: { type: array, items: { type: object, additionalProperties: true } }
+      required: [id, title, description, priority, status, created_at]
+    TaskInput:
+      type: object
+      properties:
+        title: { type: string, minLength: 2, maxLength: 160 }
+        description: { type: string, maxLength: 4000 }
+        instructions: { type: ["string", "null"], maxLength: 4000 }
+        deadline: { type: ["string", "null"], format: date-time }
+        priority: { type: string, enum: [low, normal, high, urgent] }
+        assignment_user_ids: { type: array, items: { type: string, format: uuid }, maxItems: 500 }
+      required: [title, description, priority, assignment_user_ids]
+      additionalProperties: false
+    TaskUpdate:
+      type: object
+      properties:
+        title: { type: string, minLength: 2, maxLength: 160 }
+        description: { type: string, maxLength: 4000 }
+        instructions: { type: ["string", "null"], maxLength: 4000 }
+        deadline: { type: ["string", "null"], format: date-time }
+        priority: { type: string, enum: [low, normal, high, urgent] }
+        status: { type: string, enum: [open, in_progress, submitted, completed, overdue, cancelled] }
+        assignment_user_ids: { type: array, items: { type: string, format: uuid }, maxItems: 500 }
+      additionalProperties: false
+    TaskSubmissionInput:
+      type: object
+      properties:
+        notes: { type: ["string", "null"], maxLength: 3000 }
+        evidence_paths: { type: array, items: { type: string, maxLength: 500 }, maxItems: 20 }
+      required: [evidence_paths]
+      additionalProperties: false
+    TaskSubmission:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        assignment_id: { type: string, format: uuid }
+        notes: { type: ["string", "null"] }
+        evidence_paths: { type: array, items: { type: string } }
+        status: { type: string, enum: [submitted, approved, rejected] }
+        review_note: { type: ["string", "null"] }
+        points_awarded: { type: integer }
+        submitted_at: { type: string, format: date-time }
+      required: [id, assignment_id, evidence_paths, status, points_awarded, submitted_at]
+    SubmissionReview:
+      type: object
+      properties:
+        status: { type: string, enum: [approved, rejected] }
+        review_note: { type: string, minLength: 2, maxLength: 1000 }
+        points_awarded: { type: integer, minimum: 0, maximum: 10000 }
+      required: [status, review_note, points_awarded]
+      additionalProperties: false
+    LeaderboardEntry:
+      type: object
+      properties:
+        user_id: { type: string, format: uuid }
+        full_name: { type: string }
+        profile_photo_path: { type: ["string", "null"] }
+        points: { type: integer }
+        rank: { type: integer }
+      required: [user_id, full_name, points, rank]
+    PointsTransaction:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        model_id: { type: string, format: uuid }
+        delta: { type: integer }
+        reason: { type: string }
+        created_at: { type: string, format: date-time }
+      required: [id, model_id, delta, reason, created_at]
+    PointsInput:
+      type: object
+      properties:
+        model_id: { type: string, format: uuid }
+        delta: { type: integer, minimum: -10000, maximum: 10000, not: { const: 0 } }
+        reason: { type: string, minLength: 3, maxLength: 1000 }
+      required: [model_id, delta, reason]
+      additionalProperties: false
+    AgencyAnnouncement:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        body: { type: string }
+        status: { type: string, enum: [draft, published, archived] }
+        audience: { type: string, enum: [all, selected] }
+        recipient_ids: { type: array, items: { type: string, format: uuid } }
+        published_at: { type: ["string", "null"], format: date-time }
+        is_read: { type: boolean }
+        created_at: { type: string, format: date-time }
+      required: [id, title, body, status, audience, recipient_ids, is_read, created_at]
+    AnnouncementInput:
+      type: object
+      properties:
+        title: { type: string, minLength: 2, maxLength: 160 }
+        body: { type: string, minLength: 2, maxLength: 8000 }
+        status: { type: string, enum: [draft, published] }
+        audience: { type: string, enum: [all, selected] }
+        recipient_ids: { type: array, items: { type: string, format: uuid }, maxItems: 500 }
+      required: [title, body, status, audience, recipient_ids]
+      additionalProperties: false
+    AnnouncementUpdate:
+      type: object
+      properties:
+        title: { type: string, minLength: 2, maxLength: 160 }
+        body: { type: string, minLength: 2, maxLength: 8000 }
+        status: { type: string, enum: [draft, published, archived] }
+        audience: { type: string, enum: [all, selected] }
+        recipient_ids: { type: array, items: { type: string, format: uuid }, maxItems: 500 }
+      additionalProperties: false
+    AgencyConversation:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: ["string", "null"] }
+        participants: { type: array, items: { type: string, format: uuid } }
+        last_message_at: { type: ["string", "null"], format: date-time }
+        unread_count: { type: integer }
+        created_at: { type: string, format: date-time }
+      required: [id, participants, unread_count, created_at]
+    ConversationInput:
+      type: object
+      properties:
+        recipient_id: { type: string, format: uuid }
+        title: { type: ["string", "null"], maxLength: 160 }
+        initial_message: { type: string, minLength: 1, maxLength: 4000 }
+      required: [recipient_id, initial_message]
+      additionalProperties: false
+    AgencyMessage:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        conversation_id: { type: string, format: uuid }
+        sender_id: { type: string, format: uuid }
+        body: { type: string }
+        created_at: { type: string, format: date-time }
+        read_at: { type: ["string", "null"], format: date-time }
+      required: [id, conversation_id, sender_id, body, created_at]
+    MessageInput:
+      type: object
+      properties:
+        body: { type: string, minLength: 1, maxLength: 4000 }
+      required: [body]
+      additionalProperties: false
+    AgencyNotification:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string }
+        title: { type: string }
+        body: { type: ["string", "null"] }
+        link: { type: ["string", "null"] }
+        is_read: { type: boolean }
+        created_at: { type: string, format: date-time }
+      required: [id, kind, title, is_read, created_at]
+    NotificationReadInput:
+      type: object
+      properties:
+        ids: { type: array, items: { type: string, format: uuid }, minItems: 1, maxItems: 500 }
+      required: [ids]
+      additionalProperties: false
+    DailyEntry:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        entry_date: { type: string, format: date }
+        checked_in: { type: boolean }
+        water_glasses: { type: integer }
+        measurements: { type: object, additionalProperties: true }
+        wellness: { type: array, items: { type: string } }
+        notes: { type: ["string", "null"] }
+        created_at: { type: string, format: date-time }
+      required: [id, entry_date, checked_in, water_glasses, measurements, wellness, created_at]
+    DailyEntryInput:
+      type: object
+      properties:
+        entry_date: { type: string, format: date }
+        checked_in: { type: boolean }
+        water_glasses: { type: integer, minimum: 0, maximum: 50 }
+        measurements: { type: object, additionalProperties: true }
+        wellness: { type: array, items: { type: string }, maxItems: 30 }
+        notes: { type: ["string", "null"], maxLength: 2000 }
+      required: [entry_date, checked_in, water_glasses, measurements, wellness]
+      additionalProperties: false
+    SupportRequest:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        subject: { type: string }
+        status: { type: string, enum: [open, in_progress, resolved, closed] }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        replies: { type: array, items: { $ref: "#/components/schemas/SupportReply" } }
+      required: [id, user_id, subject, status, created_at, updated_at]
+    SupportRequestInput:
+      type: object
+      properties:
+        subject: { type: string, minLength: 3, maxLength: 160 }
+        message: { type: string, minLength: 3, maxLength: 4000 }
+      required: [subject, message]
+      additionalProperties: false
+    SupportRequestUpdate:
+      type: object
+      properties:
+        status: { type: string, enum: [open, in_progress, resolved, closed] }
+      required: [status]
+      additionalProperties: false
+    SupportReply:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        request_id: { type: string, format: uuid }
+        author_id: { type: string, format: uuid }
+        body: { type: string }
+        created_at: { type: string, format: date-time }
+      required: [id, request_id, author_id, body, created_at]
+    SupportReplyInput:
+      type: object
+      properties:
+        body: { type: string, minLength: 1, maxLength: 4000 }
+      required: [body]
+      additionalProperties: false
+    AuditEvent:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        actor_id: { type: ["string", "null"], format: uuid }
+        action: { type: string }
+        entity_type: { type: string }
+        entity_id: { type: ["string", "null"] }
+        details: { type: object, additionalProperties: true }
+        created_at: { type: string, format: date-time }
+      required: [id, action, entity_type, details, created_at]
+    DashboardSummary:
+      type: object
+      properties:
+        profile: { $ref: "#/components/schemas/AgencyProfile" }
+        total_models: { type: integer }
+        pending_applications: { type: integer }
+        approved_models: { type: integer }
+        tasks: { type: integer }
+        completed_tasks: { type: integer }
+        messages: { type: integer }
+        support_requests: { type: integer }
+        leaderboard_position: { type: ["integer", "null"] }
+        upcoming_tasks: { type: array, items: { $ref: "#/components/schemas/AgencyTask" } }
+        announcements: { type: array, items: { $ref: "#/components/schemas/AgencyAnnouncement" } }
+        unread_messages: { type: integer }
+        unread_notifications: { type: integer }
+        recent_activity: { type: array, items: { type: object, additionalProperties: true } }
+      required: [profile, total_models, pending_applications, approved_models, tasks, completed_tasks, messages, support_requests, upcoming_tasks, announcements, unread_messages, unread_notifications, recent_activity]
+    AdminStats:
+      type: object
+      properties:
+        total_models: { type: integer }
+        pending_applications: { type: integer }
+        approved_models: { type: integer }
+        tasks: { type: integer }
+        completed_tasks: { type: integer }
+        messages: { type: integer }
+        support_requests: { type: integer }
+        open_support_requests: { type: integer }
+      required: [total_models, pending_applications, approved_models, tasks, completed_tasks, messages, support_requests, open_support_requests]

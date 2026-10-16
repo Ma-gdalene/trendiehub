@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "TRENDIE MODELS"
+description = "A public-first modeling agency platform for TRENDIE MODELS in Accra, Ghana, with Supabase-backed model applications, agency administration, task workflows, messaging, points, support, and private model tools."
+version = "1.0.0"
+id = "artifacts/trendie-models"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24451
+
+[services.development]
+run = "pnpm --filter @workspace/trendie-models run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/trendie-models", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/trendie-models/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24451"
+BASE_PATH = "/"
