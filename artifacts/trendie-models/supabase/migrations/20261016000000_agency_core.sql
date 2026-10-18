@@ -438,6 +438,10 @@ begin
     updated_at = now()
   where id = p_id returning * into changed_task;
   if changed_task.id is null then raise exception 'Task not found' using errcode = 'P0002'; end if;
+  if p_patch->>'status' = 'cancelled' then
+    update public.task_assignments set status = 'cancelled'
+    where task_id = p_id and status not in ('completed', 'cancelled');
+  end if;
   if p_assignment_user_ids is not null then
     update public.task_assignments set status = 'cancelled'
     where task_id = p_id and status not in ('completed', 'cancelled')
@@ -567,6 +571,16 @@ language sql stable security definer set search_path = public, private, pg_temp 
     and (private.is_admin() or private.is_active_model())
   order by p.points_balance desc, p.full_name asc
   limit 100;
+$$;
+
+create or replace function public.get_agency_admins()
+returns table(id uuid, full_name text)
+language sql stable security definer set search_path = public, private, pg_temp as $$
+  select p.id, p.full_name
+  from public.profiles p
+  where p.role = 'admin' and p.suspended_at is null
+    and (private.is_admin() or private.is_active_model())
+  order by p.full_name;
 $$;
 
 create or replace function public.admin_save_announcement(
@@ -845,6 +859,7 @@ revoke all on function public.submit_task(uuid, text, text[]) from public;
 revoke all on function public.admin_review_submission(uuid, text, text, integer) from public;
 revoke all on function public.admin_award_points(uuid, integer, text) from public;
 revoke all on function public.get_leaderboard() from public;
+revoke all on function public.get_agency_admins() from public;
 revoke all on function public.admin_save_announcement(uuid, text, text, text, text, uuid[]) from public;
 revoke all on function public.start_conversation(uuid, text, text) from public;
 revoke all on function public.create_support_request(text, text) from public;
@@ -857,6 +872,7 @@ grant execute on function public.submit_task(uuid, text, text[]) to authenticate
 grant execute on function public.admin_review_submission(uuid, text, text, integer) to authenticated;
 grant execute on function public.admin_award_points(uuid, integer, text) to authenticated;
 grant execute on function public.get_leaderboard() to authenticated;
+grant execute on function public.get_agency_admins() to authenticated;
 grant execute on function public.admin_save_announcement(uuid, text, text, text, text, uuid[]) to authenticated;
 grant execute on function public.start_conversation(uuid, text, text) to authenticated;
 grant execute on function public.create_support_request(text, text) to authenticated;

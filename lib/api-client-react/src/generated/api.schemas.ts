@@ -119,6 +119,11 @@ export interface ModelSuspensionInput {
   suspended: boolean;
 }
 
+export interface AgencyAdminContact {
+  id: string;
+  full_name: string;
+}
+
 export type AgencyApplicationStatus = typeof AgencyApplicationStatus[keyof typeof AgencyApplicationStatus];
 
 

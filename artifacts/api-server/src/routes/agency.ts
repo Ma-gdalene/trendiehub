@@ -20,6 +20,7 @@ import {
   ListAnnouncementsResponse,
   ListApplicationsQueryParams,
   ListApplicationsResponse,
+  ListAgencyAdminsResponse,
   ListAuditLogsResponse,
   ListConversationsResponse,
   ListDailyEntriesResponse,
@@ -226,7 +227,12 @@ async function taskRows(ctx: AgencyContext): Promise<Row[]> {
       .from("tasks")
       .select("*,task_assignments(id,model_id,status,task_submissions(*),assignee:profiles!task_assignments_model_id_fkey(id,full_name,email))")
       .order("created_at", { ascending: false });
-    return (unwrap(result) as Row[]).map((row) => parseTask(row));
+    return (unwrap(result) as Row[]).flatMap((row) => {
+      const assignments = (row.task_assignments ?? []) as Row[];
+      return assignments.length
+        ? assignments.map((assignment) => parseTask(row, assignment))
+        : [parseTask(row)];
+    });
   }
   const result = await ctx.client
     .from("task_assignments")
@@ -472,6 +478,16 @@ router.post(
 );
 
 router.get(
+  "/agency-admins",
+  safe(async (req, res) => {
+    const ctx = await getAgencyContext(req, res);
+    if (!ctx) return;
+    const result = await ctx.client.rpc("get_agency_admins");
+    res.json(ListAgencyAdminsResponse.parse(unwrap(result)));
+  }),
+);
+
+router.get(
   "/applications",
   safe(async (req, res) => {
     const ctx = await getAgencyContext(req, res);
@@ -705,7 +721,11 @@ router.patch(
     const params = parseParams(UpdateAnnouncementParams, req.params, res);
     const body = parseBody(UpdateAnnouncementBody, req.body, res);
     if (!params || !body) return;
-    const current = await ctx.client.from("announcements").select("title,body,status,audience").eq("id", params.id).single();
+    const current = await ctx.client
+      .from("announcements")
+      .select("title,body,status,audience,announcement_recipients(user_id)")
+      .eq("id", params.id)
+      .single();
     const existing = unwrap(current) as Row;
     const result = await ctx.client.rpc("admin_save_announcement", {
       p_id: params.id,
@@ -713,7 +733,7 @@ router.patch(
       p_body: body.body ?? existing.body,
       p_status: body.status ?? existing.status,
       p_audience: body.audience ?? existing.audience,
-      p_recipient_ids: body.recipient_ids ?? [],
+      p_recipient_ids: body.recipient_ids ?? ((existing.announcement_recipients ?? []) as Row[]).map((recipient) => recipient.user_id),
     });
     const data = firstRow(unwrap(result) as Row | Row[]);
     res.json(UpdateAnnouncementResponse.parse(parseAnnouncement(data as Row, ctx.user.id)));

@@ -387,6 +387,7 @@ button, input, textarea, select { font: inherit; }
 a { color: inherit; text-decoration: none; }
 .wrap { width: min(1160px, calc(100% - 64px)); margin-inline: auto; }
 .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); }
+.brand-logo { display:block; width:48px; height:48px; flex:0 0 auto; object-fit:contain; }
 .brand-mark { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid currentColor; border-radius: 50%; font: 600 14px var(--app-font-serif); letter-spacing: -.04em; }
 .brand-name { display: flex; flex-direction: column; font-size: 12px; letter-spacing: .16em; font-weight: 600; line-height: 1.25; }
 .brand-name b { font-weight: 700; }
@@ -420,10 +421,8 @@ a { color: inherit; text-decoration: none; }
 .hero-proof { display: flex; align-items: center; gap: 12px; margin-top: 55px; color: #7c827b; font: italic 14px var(--app-font-serif); }
 .hero-proof span { width: 34px; height: 1px; background: var(--ochre); }
 .hero-art { height: 506px; position: relative; margin: 8px 18px 0 24px; }
-.image-placeholder { background-color: #e8e1d5; background-image: linear-gradient(135deg, rgba(38,61,55,.08), transparent 46%), repeating-linear-gradient(135deg, transparent 0 19px, rgba(38,61,55,.035) 20px 21px); color: #63736a; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border: 1px solid #d8d0c3; }
-.hero-image { height: 100%; width: 88%; margin-left: auto; }
-.hero-image span { font: 500 22px var(--app-font-serif); color: #50655a; }
-.hero-image small { font-size: 10px; letter-spacing: .06em; }
+.hero-image { height: 100%; width: 88%; margin-left: auto; overflow:hidden; background:#e8e1d5; border:1px solid #d8d0c3; box-shadow:0 20px 45px rgba(38,61,55,.12); }
+.hero-image img { display:block; width:100%; height:100%; object-fit:cover; object-position:center 48%; }
 .hero-stamp { position: absolute; left: -3px; bottom: 52px; width: 115px; height: 115px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: #c6a36d; border-radius: 50%; color: #293c34; transform: rotate(-9deg); box-shadow: 0 10px 25px rgba(38,61,55,.12); }
 .hero-stamp b { font: 600 29px var(--app-font-serif); }
 .hero-stamp small { font-size: 8px; line-height: 1.35; letter-spacing: .15em; text-align: center; }
@@ -498,6 +497,7 @@ a { color: inherit; text-decoration: none; }
 .sidebar { width:248px; flex:0 0 248px; min-height:100dvh; position:sticky; top:0; height:100dvh; display:flex; flex-direction:column; padding:26px 16px 15px; background:#263f38; color:#ede9de; z-index:30; }
 .sidebar-brand { padding:0 8px 35px; display:flex; align-items:center; justify-content:space-between; }
 .sidebar .brand-mark { width:38px; height:38px; }
+.sidebar .brand-logo { width:46px; height:46px; }
 .sidebar .brand-name { font-size:11px; }
 .sidebar-kicker { padding:0 12px 11px; color:#b3b5a4; font-size:8px; font-weight:700; letter-spacing:.2em; }
 .side-nav { display:flex; flex-direction:column; gap:3px; overflow-y:auto; }

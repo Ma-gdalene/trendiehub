@@ -315,6 +315,16 @@ export const SetModelSuspensionResponse = zod.object({
 
 
 /**
+ * @summary List agency contacts available for private conversations
+ */
+export const ListAgencyAdminsResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "full_name": zod.string()
+})
+export const ListAgencyAdminsResponse = zod.array(ListAgencyAdminsResponseItem)
+
+
+/**
  * @summary List the current user's application or applications for admin review
  */
 export const ListApplicationsQueryParams = zod.object({

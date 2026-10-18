@@ -132,6 +132,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AgencyProfile"
+  /agency-admins:
+    get:
+      operationId: listAgencyAdmins
+      tags: [agency]
+      summary: List agency contacts available for private conversations
+      responses:
+        "200":
+          description: Agency staff directory
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgencyAdminContact"
   /applications:
     get:
       operationId: listApplications
@@ -679,6 +693,13 @@ components:
       properties:
         suspended: { type: boolean }
       required: [suspended]
+      additionalProperties: false
+    AgencyAdminContact:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        full_name: { type: string }
+      required: [id, full_name]
       additionalProperties: false
     AgencyApplication:
       type: object

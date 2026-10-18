@@ -21,6 +21,7 @@ import type {
 
 import type {
   AdminStats,
+  AgencyAdminContact,
   AgencyAnnouncement,
   AgencyApplication,
   AgencyConversation,
@@ -667,6 +668,83 @@ export const useSetModelSuspension = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getSetModelSuspensionMutationOptions(options));
     }
+
+export const getListAgencyAdminsUrl = () => {
+
+
+
+
+  return `/api/agency-admins`
+}
+
+/**
+ * @summary List agency contacts available for private conversations
+ */
+export const listAgencyAdmins = async ( options?: Parameters<typeof customFetch>[1]): Promise<AgencyAdminContact[]> => {
+
+  return customFetch<AgencyAdminContact[]>(getListAgencyAdminsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAgencyAdminsQueryKey = () => {
+    return [
+    `/api/agency-admins`
+    ] as const;
+    }
+
+
+export const getListAgencyAdminsQueryOptions = <TData = Awaited<ReturnType<typeof listAgencyAdmins>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAgencyAdmins>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAgencyAdminsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAgencyAdmins>>> = ({ signal }) => listAgencyAdmins({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAgencyAdmins>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAgencyAdminsQueryResult = NonNullable<Awaited<ReturnType<typeof listAgencyAdmins>>>
+export type ListAgencyAdminsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List agency contacts available for private conversations
+ */
+
+export function useListAgencyAdmins<TData = Awaited<ReturnType<typeof listAgencyAdmins>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAgencyAdmins>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAgencyAdminsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getListApplicationsUrl = (params?: ListApplicationsParams,) => {
   const normalizedParams = new URLSearchParams();

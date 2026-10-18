@@ -17,6 +17,7 @@ function Router() {
           <Route path="/sign-in">{() => <AuthPage mode="sign-in" />}</Route>
           <Route path="/sign-up">{() => <AuthPage mode="sign-up" />}</Route>
           <Route path="/forgot-password">{() => <AuthPage mode="forgot-password" />}</Route>
+          <Route path="/reset-password">{() => <AuthPage mode="reset-password" />}</Route>
           {['/dashboard','/profile','/models','/applications','/tasks','/points','/leaderboard','/messages','/announcements','/daily-tracker','/notifications','/support','/audit-logs','/settings'].map(path =>
             <Route key={path} path={path}>{() => <ProtectedPage path={path} />}</Route>
           )}

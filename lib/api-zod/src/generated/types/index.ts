@@ -7,6 +7,7 @@
  */
 
 export * from './adminStats';
+export * from './agencyAdminContact';
 export * from './agencyAnnouncement';
 export * from './agencyAnnouncementAudience';
 export * from './agencyAnnouncementStatus';
