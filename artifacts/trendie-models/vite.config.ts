@@ -10,15 +10,43 @@ const rawPort = process.env.PORT || '3000';
 const port = Number(rawPort) || 3000;
 const basePath = process.env.BASE_PATH || '/';
 
-function generate404Html() {
+function generateSpaRoutes() {
+  const routes = [
+    'dashboard',
+    'profile',
+    'tasks',
+    'models',
+    'applications',
+    'points',
+    'leaderboard',
+    'messages',
+    'announcements',
+    'daily-tracker',
+    'support',
+    'settings',
+    'notifications',
+    'sign-in',
+    'sign-up',
+    'reset-password',
+    'forgot-password',
+  ];
   return {
-    name: 'generate-404-html',
+    name: 'generate-spa-routes',
     closeBundle() {
       const outDir = path.resolve(import.meta.dirname, 'dist/public');
       const indexPath = path.join(outDir, 'index.html');
-      const notFoundPath = path.join(outDir, '404.html');
-      if (fs.existsSync(indexPath)) {
-        fs.copyFileSync(indexPath, notFoundPath);
+      if (!fs.existsSync(indexPath)) return;
+      const indexContent = fs.readFileSync(indexPath, 'utf-8');
+
+      fs.writeFileSync(path.join(outDir, '404.html'), indexContent);
+
+      for (const route of routes) {
+        fs.writeFileSync(path.join(outDir, `${route}.html`), indexContent);
+        const routeDir = path.join(outDir, route);
+        if (!fs.existsSync(routeDir)) {
+          fs.mkdirSync(routeDir, { recursive: true });
+        }
+        fs.writeFileSync(path.join(routeDir, 'index.html'), indexContent);
       }
     },
   };
@@ -30,7 +58,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),
-    generate404Html(),
+    generateSpaRoutes(),
     ...(process.env.NODE_ENV !== 'production' &&
     process.env.REPL_ID !== undefined
       ? [
