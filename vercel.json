@@ -22,9 +22,22 @@
       }
     },
     {
-      "source": "/(.*)",
+      "source": "/assets/(.*)",
       "destination": {
         "service": "trendie-models"
+      }
+    },
+    {
+      "source": "/(.*\\..*)",
+      "destination": {
+        "service": "trendie-models"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "trendie-models",
+        "path": "/index.html"
       }
     }
   ]

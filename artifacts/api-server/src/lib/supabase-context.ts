@@ -14,10 +14,11 @@ export type AgencyContext = {
   profile: ProfileRow;
 };
 
-function getSupabaseConfig(): { url: string; anonKey: string } | null {
-  const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
-  const anonKey = process.env.SUPABASE_ANON_KEY ?? process.env.VITE_SUPABASE_ANON_KEY;
-  return url && anonKey ? { url, anonKey } : null;
+function getSupabaseConfig(): { url: string; anonKey: string; serviceRoleKey?: string } {
+  const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? "https://hapjyuomrpakftoljlcf.supabase.co";
+  const anonKey = process.env.SUPABASE_ANON_KEY ?? process.env.VITE_SUPABASE_ANON_KEY ?? "sb_publishable_GESWlsaY7eXe-heM1lDMiA_z5jtk7iY";
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  return { url, anonKey, serviceRoleKey };
 }
 
 export async function getAgencyContext(
@@ -57,15 +58,38 @@ export async function getAgencyContext(
     return null;
   }
 
-  const { data: profile, error: profileError } = await client
+  let { data: profile, error: profileError } = await client
     .from("profiles")
     .select("id,email,role,suspended_at")
     .eq("id", user.id)
     .maybeSingle();
 
   if (profileError || !profile) {
-    res.status(403).json({ error: "This account is not set up for TRENDIE MODELS." });
-    return null;
+    const isAdmin = user.email?.toLowerCase() === "hellotrendiemodels@gmail.com";
+    const insertRes = await client
+      .from("profiles")
+      .upsert(
+        {
+          id: user.id,
+          email: user.email?.toLowerCase() ?? "",
+          full_name:
+            (user.user_metadata?.full_name as string) ||
+            (user.email ? user.email.split("@")[0] : "Model"),
+          role: isAdmin ? "admin" : "model",
+          application_status: isAdmin ? "approved" : "not_submitted",
+          points_balance: 100,
+        },
+        { onConflict: "id" }
+      )
+      .select("id,email,role,suspended_at")
+      .single();
+
+    if (insertRes.data) {
+      profile = insertRes.data;
+    } else {
+      res.status(403).json({ error: "This account is not set up for TRENDIE MODELS." });
+      return null;
+    }
   }
   const activeProfile = profile as ProfileRow;
   if (activeProfile.suspended_at) {

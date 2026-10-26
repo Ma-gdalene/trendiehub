@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
@@ -9,12 +10,27 @@ const rawPort = process.env.PORT || '3000';
 const port = Number(rawPort) || 3000;
 const basePath = process.env.BASE_PATH || '/';
 
+function generate404Html() {
+  return {
+    name: 'generate-404-html',
+    closeBundle() {
+      const outDir = path.resolve(import.meta.dirname, 'dist/public');
+      const indexPath = path.join(outDir, 'index.html');
+      const notFoundPath = path.join(outDir, '404.html');
+      if (fs.existsSync(indexPath)) {
+        fs.copyFileSync(indexPath, notFoundPath);
+      }
+    },
+  };
+}
+
 export default defineConfig({
   base: basePath,
   plugins: [
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),
+    generate404Html(),
     ...(process.env.NODE_ENV !== 'production' &&
     process.env.REPL_ID !== undefined
       ? [
