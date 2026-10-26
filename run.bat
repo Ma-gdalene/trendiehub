@@ -14,9 +14,9 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-echo [INFO] Launching Trendie Models Platform outside Replit...
+echo [INFO] Launching Trendie Models Platform (Frontend + API Server)...
 echo [INFO] URL: http://localhost:3000
 timeout /t 2 /nobreak >nul
 start http://localhost:3000
-call pnpm --filter @workspace/trendie-models run dev
+call pnpm run dev:all
 pause
