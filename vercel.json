@@ -1,31 +1,14 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "services": {
-    "api-server": {
-      "root": "artifacts/api-server",
-      "framework": "express",
-      "buildCommand": "pnpm --filter @workspace/api-server run build",
-      "outputDirectory": "dist"
-    },
-    "trendie-models": {
-      "root": "artifacts/trendie-models",
-      "framework": "vite",
-      "buildCommand": "pnpm --filter @workspace/trendie-models run build",
-      "outputDirectory": "dist/public"
-    }
-  },
+  "buildCommand": "pnpm --filter @workspace/trendie-models run build",
+  "outputDirectory": "artifacts/trendie-models/dist/public",
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": {
-        "service": "api-server"
-      }
+      "destination": "/api/index"
     },
     {
       "source": "/(.*)",
-      "destination": {
-        "service": "trendie-models"
-      }
+      "destination": "/index.html"
     }
   ]
 }
