@@ -5,7 +5,7 @@ import {
   Activity, ArrowRight, ArrowUpRight, Bell, BookOpen, Camera, Check, CheckCircle2, ChevronRight,
   CircleAlert, CircleHelp, ClipboardList, Clock3, FileText, ImagePlus, LayoutDashboard, LogOut,
   Mail, Menu, MessageCircle, Plus, RefreshCw, Search, Send, Settings, ShieldCheck, Sparkles,
-  Target, Trophy, Users, X, Droplets, CalendarDays, UserRound, Inbox, ExternalLink, Trash2,
+  Target, Trophy, Users, X, Droplets, CalendarDays, UserRound, Inbox, ExternalLink, Trash2, Globe,
 } from 'lucide-react';
 import {
   useGetProfile, useGetDashboard, useListModels, useListApplications, useSubmitApplication,
@@ -118,8 +118,8 @@ export function PublicHome() {
           <div className="hero-art">
             <div className="hero-image">
               <img
-                src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1200&q=85&fit=crop&crop=faces,top"
-                alt="TRENDIE MODELS — editorial portrait"
+                src="/trendie-hero.png"
+                alt="TRENDIE MODELS — High-fashion editorial Black female and male models together, Accra Ghana"
                 fetchPriority="high"
               />
             </div>
@@ -546,8 +546,8 @@ function PrivateGalleryItem({ bucket, path, label }: { bucket: string; path: str
   if (!url) return <span className="private-gallery-item"><span className="private-image-loading">Image unavailable</span></span>;
   return <a className="private-gallery-item" href={url} target="_blank" rel="noreferrer" aria-label={`Open ${label}`}><img src={url} alt={label} loading="lazy"/></a>;
 }
-const modelNav = [['Overview','/dashboard',LayoutDashboard],['My profile','/profile',UserRound],['My tasks','/tasks',ClipboardList],['Points & ranking','/points',Trophy],['Messages','/messages',MessageCircle],['Announcements','/announcements',BookOpen],['Daily tracker','/daily-tracker',Activity],['Notifications','/notifications',Bell],['Help & support','/support',CircleHelp],['Settings','/settings',Settings]] as const;
-const adminNav = [['Overview','/dashboard',LayoutDashboard],['Models','/models',Users],['Applications','/applications',FileText],['Tasks','/tasks',ClipboardList],['Points','/points',Trophy],['Messages','/messages',MessageCircle],['Announcements','/announcements',BookOpen],['Notifications','/notifications',Bell],['Support','/support',CircleHelp],['Audit log','/audit-logs',ShieldCheck],['Settings','/settings',Settings]] as const;
+const modelNav = [['Overview','/dashboard',LayoutDashboard],['My profile','/profile',UserRound],['My tasks','/tasks',ClipboardList],['Points & ranking','/points',Trophy],['Messages','/messages',MessageCircle],['Announcements','/announcements',BookOpen],['Daily tracker','/daily-tracker',Activity],['Notifications','/notifications',Bell],['Help & support','/support',CircleHelp],['Agency Website','/',Globe],['Settings','/settings',Settings]] as const;
+const adminNav = [['Overview','/dashboard',LayoutDashboard],['Models','/models',Users],['Applications','/applications',FileText],['Tasks','/tasks',ClipboardList],['Points','/points',Trophy],['Messages','/messages',MessageCircle],['Announcements','/announcements',BookOpen],['Notifications','/notifications',Bell],['Support','/support',CircleHelp],['Audit log','/audit-logs',ShieldCheck],['Agency Website','/',Globe],['Settings','/settings',Settings]] as const;
 const routeTitles: Record<string,string> = { '/dashboard':'Overview','/profile':'My profile','/models':'Models','/applications':'Applications','/tasks':'Tasks','/points':'Points & ranking','/leaderboard':'Leaderboard','/messages':'Messages','/announcements':'Announcements','/daily-tracker':'Daily tracker','/notifications':'Notifications','/support':'Support','/audit-logs':'Audit log','/settings':'Settings' };
 
 export function ProtectedPage({ path }: { path: string }) {
@@ -560,13 +560,13 @@ export function ProtectedPage({ path }: { path: string }) {
   const admin = profile.role === 'admin';
   if (!admin && ['/models','/applications','/audit-logs'].includes(path)) return <div className="standalone-state"><EmptyState title="This space is for the agency team." body="Your member dashboard is ready for you." action={<Link href="/dashboard" className="button button-primary">Back to overview</Link>}/></div>;
   const currentTitle = routeTitles[path] || 'Agency space';
-  return <div className="app-shell"><aside className={`sidebar ${open ? 'sidebar-open' : ''}`}><div className="sidebar-brand"><Brand light/><button className="mobile-close" onClick={() => setOpen(false)} aria-label="Close navigation"><X/></button></div><div className="sidebar-kicker">{admin ? 'AGENCY CONSOLE' : 'MEMBER SPACE'}</div><nav className="side-nav">{(admin ? adminNav : modelNav).map(([label, href, Icon]) => <Link href={href} key={href} className={`side-link ${path === href || (path === '/leaderboard' && href === '/points') ? 'side-link-active' : ''}`} onClick={() => setOpen(false)}><Icon size={18}/><span>{label}</span></Link>)}</nav><div className="sidebar-bottom"><div className="sidebar-help"><CircleHelp/><div><b>Need a hand?</b><small>Our team is here for you.</small></div><Link href="/support"><ArrowUpRight size={16}/></Link></div><div className="user-mini"><span className="avatar">{initials(profile.full_name)}</span><div className="user-mini-text"><b>{profile.full_name || 'Member'}</b><small>{admin ? 'Agency admin' : 'Agency member'}</small></div></div><button type="button" className="sidebar-signout-row" onClick={async () => { await supabase?.auth.signOut(); go('/'); }}><LogOut size={16}/><span>Sign out</span></button></div></aside>{open && <button className="mobile-scrim" onClick={() => setOpen(false)} aria-label="Close menu"/>}<div className="main-column"><header className="app-topbar"><button className="mobile-menu" onClick={() => setOpen(true)} aria-label="Open menu"><Menu/></button><div className="breadcrumb"><span>Agency space</span><ChevronRight size={14}/><b>{currentTitle}</b></div><div className="topbar-tools"><span className="today-label">{new Date().toLocaleDateString('en-GH',{weekday:'short',month:'short',day:'numeric'})}</span><Link href="/notifications" className="top-icon" title="Notifications"><Bell size={18}/></Link><Link href="/profile" className="top-avatar" title="My profile">{initials(profile.full_name)}</Link><button type="button" className="topbar-signout-btn" onClick={async () => { await supabase?.auth.signOut(); go('/'); }} title="Sign out"><LogOut size={15}/><span>Sign out</span></button></div></header><main className="page-content"><RouteScreen path={path} profile={profile} admin={admin}/></main></div></div>;
+  return <div className="app-shell"><aside className={`sidebar ${open ? 'sidebar-open' : ''}`}><div className="sidebar-brand"><Brand light/><button className="mobile-close" onClick={() => setOpen(false)} aria-label="Close navigation"><X/></button></div><div className="sidebar-kicker">{admin ? 'AGENCY CONSOLE' : 'MEMBER SPACE'}</div><nav className="side-nav">{(admin ? adminNav : modelNav).map(([label, href, Icon]) => <Link href={href} key={href} className={`side-link ${path === href || (path === '/leaderboard' && href === '/points') ? 'side-link-active' : ''}`} onClick={() => setOpen(false)}><Icon size={18}/><span>{label}</span></Link>)}</nav><div className="sidebar-bottom"><div className="sidebar-help"><CircleHelp/><div><b>Need a hand?</b><small>Our team is here for you.</small></div><Link href="/support"><ArrowUpRight size={16}/></Link></div><div className="user-mini"><span className="avatar">{initials(profile.full_name)}</span><div className="user-mini-text"><b>{profile.full_name || 'Member'}</b><small>{admin ? 'Agency admin' : 'Agency member'}</small></div></div><button type="button" className="sidebar-signout-row" onClick={async () => { await supabase?.auth.signOut(); go('/'); }}><LogOut size={16}/><span>Sign out</span></button></div></aside>{open && <button className="mobile-scrim" onClick={() => setOpen(false)} aria-label="Close menu"/>}<div className="main-column"><header className="app-topbar"><button className="mobile-menu" onClick={() => setOpen(true)} aria-label="Open menu"><Menu/></button><div className="breadcrumb"><span>Agency space</span><ChevronRight size={14}/><b>{currentTitle}</b></div><div className="topbar-tools"><span className="today-label">{new Date().toLocaleDateString('en-GH',{weekday:'short',month:'short',day:'numeric'})}</span><Link href="/" className="top-home-btn" title="View Agency Website"><Globe size={15}/><span>Website</span></Link><Link href="/notifications" className="top-icon" title="Notifications"><Bell size={18}/></Link><Link href="/profile" className="top-avatar" title="My profile">{initials(profile.full_name)}</Link><button type="button" className="topbar-signout-btn" onClick={async () => { await supabase?.auth.signOut(); go('/'); }} title="Sign out"><LogOut size={15}/><span>Sign out</span></button></div></header><main className="page-content"><RouteScreen path={path} profile={profile} admin={admin}/></main></div></div>;
 }
 
 function RouteScreen({ path, profile, admin }: { path: string; profile: AgencyProfile; admin: boolean }) {
   switch (path) {
     case '/dashboard': return <Dashboard profile={profile} admin={admin}/>;
-    case '/profile': return <Profile profile={profile}/>;
+    case '/profile': return <Profile profile={profile} admin={admin}/>;
     case '/models': return <Models/>;
     case '/applications': return <Applications/>;
     case '/tasks': return <Tasks admin={admin} modelId={profile.id}/>;
@@ -574,7 +574,7 @@ function RouteScreen({ path, profile, admin }: { path: string; profile: AgencyPr
     case '/messages': return <Messages profile={profile} admin={admin}/>;
     case '/announcements': return <Announcements admin={admin}/>;
     case '/daily-tracker': return <Tracker/>;
-    case '/notifications': return <Notifications userId={profile.id}/>;
+    case '/notifications': return <Notifications userId={profile.id} admin={admin}/>;
     case '/support': return <Support admin={admin}/>;
     case '/audit-logs': return <Audit/>;
     case '/settings': return <SettingsPage profile={profile}/>;
@@ -589,12 +589,12 @@ function Dashboard({ profile, admin }: { profile: AgencyProfile; admin: boolean 
     {!admin && profile.application_status !== 'approved' && <div className="application-banner"><div className="banner-icon"><FileText/></div><div><b>{profile.application_status === 'pending' ? 'Your application is with our team.' : profile.application_status === 'rejected' ? 'Your application needs another look.' : 'Your agency journey begins with an application.'}</b><p>{profile.application_status === 'pending' ? 'We’ll keep you updated as soon as there’s news.' : profile.review_reason || 'Complete your profile and share a little about yourself to apply.'}</p></div><Pill status={profile.application_status}/>{profile.application_status !== 'pending' && <Link href="/profile" className="text-link">Continue <ArrowRight size={15}/></Link>}</div>}
     <div className="metric-grid">{admin ? <><Metric icon={<Users/>} label="Models" value={data.total_models} hint={`${data.approved_models} approved`} tone="olive"/><Metric icon={<FileText/>} label="Applications" value={data.pending_applications} hint="Awaiting review" tone="sand"/><Metric icon={<ClipboardList/>} label="Active tasks" value={data.tasks} hint={`${data.completed_tasks} completed`} tone="peach"/><Metric icon={<CircleHelp/>} label="Support requests" value={data.support_requests} hint="Across the agency" tone="blue"/></> : <><Metric icon={<Trophy/>} label="Points earned" value={profile.points} hint={data.leaderboard_position ? `Ranked #${data.leaderboard_position}` : 'Keep building momentum'} tone="olive"/><Metric icon={<ClipboardList/>} label="Your tasks" value={data.tasks} hint={`${data.completed_tasks} completed`} tone="sand"/><Metric icon={<MessageCircle/>} label="Messages" value={data.unread_messages} hint="Unread conversations" tone="peach"/><Metric icon={<Bell/>} label="Notifications" value={data.unread_notifications} hint="Updates for you" tone="blue"/></>}</div>
     <div className="dashboard-grid"><section className="panel"><div className="panel-head"><div><p className="section-kicker">UP NEXT</p><h2>{admin ? 'Agency pulse' : 'Upcoming tasks'}</h2></div><Link href={admin ? '/models' : '/tasks'} className="panel-link">View all <ArrowRight size={15}/></Link></div>{admin ? <div className="quick-links"><Link href="/applications"><span className="quick-icon"><FileText/></span><span><b>Applications to review</b><small>{data.pending_applications} waiting for a decision</small></span><ChevronRight/></Link><Link href="/support"><span className="quick-icon"><CircleHelp/></span><span><b>Support requests</b><small>{data.support_requests} conversations in progress</small></span><ChevronRight/></Link><Link href="/announcements"><span className="quick-icon"><BookOpen/></span><span><b>Keep the community in the loop</b><small>Share a new agency announcement</small></span><ChevronRight/></Link></div> : data.upcoming_tasks.length ? <div>{data.upcoming_tasks.slice(0,4).map(t => <TaskRow key={t.id} task={t}/>)}</div> : <EmptyState title="A little breathing room." body="There are no upcoming tasks right now. New assignments will appear here."/>}</section>
-      <section className="panel"><div className="panel-head"><div><p className="section-kicker">FROM THE AGENCY</p><h2>Latest notes</h2></div><Link href="/announcements" className="panel-link">All notes <ArrowRight size={15}/></Link></div>{data.announcements.length ? data.announcements.slice(0,3).map(a=><article className="announcement-mini" key={a.id}><span className="announcement-mark"><BookOpen size={17}/></span><div><h3>{a.title}</h3><p>{a.body}</p><small>{fmt(a.created_at)}</small></div></article>) : <EmptyState title="A quiet bulletin board." body="Agency news will show here when it’s shared."/>}</section></div>
+      <section className="panel"><div className="panel-head"><div><p className="section-kicker">FROM THE AGENCY</p><h2>Latest notes</h2></div><Link href="/announcements" className="panel-link">All notes <ArrowRight size={15}/></Link></div>{data.announcements.length ? data.announcements.slice(0,3).map(a=><article className="announcement-mini" key={a.id}><span className="announcement-mark"><BookOpen size={17}/></span><div><h3>{a.title}</h3><p>{a.body}</p><small>{fmt(a.created_at)}</small></div></article>) : <EmptyState title="Welcome to Trendie" body="Prepare for your portfolio shoot at a cost of 100 Ghana Cedis."/>}</section></div>
     <section className="panel activity-panel"><div className="panel-head"><div><p className="section-kicker">RECENT ACTIVITY</p><h2>{admin ? 'Agency activity' : 'Your recent progress'}</h2></div></div>{data.recent_activity.length ? data.recent_activity.slice(0,5).map((item,i)=><div className="activity-row" key={i}><i/><span>{String(item['description'] || item['action'] || 'Agency activity')}</span><small>{item['created_at'] ? fmt(String(item['created_at'])) : 'Recently'}</small></div>) : <p className="quiet-line">Your new activity will appear here.</p>}</section>
   </>;
 }
 
-function Profile({ profile }: { profile: AgencyProfile }) {
+function Profile({ profile, admin = false }: { profile: AgencyProfile; admin?: boolean }) {
   const qc = useQueryClient();
   const update = useUpdateProfile();
   const submitApp = useSubmitApplication();
@@ -661,11 +661,11 @@ function Profile({ profile }: { profile: AgencyProfile }) {
     <PageTitle title="Your profile" description="Help us understand who you are and where you’d like to go."/>
     <div className="profile-layout">
       <aside className="panel profile-summary">
-        {photoUrl ? <img className="profile-photo" src={photoUrl} alt={`${profile.full_name || 'Model'} portrait`}/> : <div className="profile-photo-slot"><Camera/><span>Portrait</span><small>Private photo</small></div>}
-        <h2>{profile.full_name || 'Your name'}</h2><p>{profile.location || 'Add your location'}</p>
-        <Pill status={profile.application_status}/>
-        <div className="completion"><div><span>Profile completion</span><b>{profile.profile_completion}%</b></div><div className="progress-track"><i style={{ width: `${Math.min(100, profile.profile_completion)}%` }}/></div><small>A complete profile helps our team get to know you.</small></div>
-        <div className="points-preview"><Trophy/><span><b>{profile.points}</b><small>agency points</small></span></div>
+        {photoUrl ? <img className="profile-photo" src={photoUrl} alt={`${profile.full_name || 'Member'} portrait`}/> : <div className="profile-photo-slot"><Camera/><span>Portrait</span><small>Private photo</small></div>}
+        <h2>{profile.full_name || 'Your name'}</h2><p>{(admin || profile.role === 'admin') ? 'Agency Administrator · Accra, Ghana' : profile.location || 'Add your location'}</p>
+        {(admin || profile.role === 'admin') ? <span className="pill pill-approved"><ShieldCheck size={12}/> Agency Admin</span> : <Pill status={profile.application_status}/>}
+        {!(admin || profile.role === 'admin') && <div className="completion"><div><span>Profile completion</span><b>{profile.profile_completion}%</b></div><div className="progress-track"><i style={{ width: `${Math.min(100, profile.profile_completion)}%` }}/></div><small>A complete profile helps our team get to know you.</small></div>}
+        {!(admin || profile.role === 'admin') && <div className="points-preview"><Trophy/><span><b>{profile.points}</b><small>agency points</small></span></div>}
         {profile.review_reason && <div className="review-note"><b>Team feedback</b><p>{profile.review_reason}</p></div>}
       </aside>
       <div className="profile-right">
@@ -691,7 +691,31 @@ function Profile({ profile }: { profile: AgencyProfile }) {
           {notice && <p className="form-notice" role="status">{notice}</p>}
           <div className="form-footer"><span>Only share details you’re comfortable sharing.</span><Button disabled={update.isPending}>{update.isPending ? 'Saving…' : 'Save changes'} <Check size={16}/></Button></div>
         </form>
-        {['not_submitted', 'rejected'].includes(profile.application_status) && <form className="panel application-submit" onSubmit={application}><div><p className="section-kicker">YOUR APPLICATION</p><h2>{profile.application_status === 'rejected' ? 'Update your application' : 'Ready to introduce yourself?'}</h2><p>Tell our team what you’re hoping to explore. Your details stay private while we review.</p></div><Field label="Why would you like to join TRENDIE MODELS?"><textarea maxLength={2000} rows={4} value={statement} onChange={e => setStatement(e.target.value)} placeholder="A few words in your own voice"/></Field><div className="form-footer"><span>Application status: <Pill status={profile.application_status}/></span><Button disabled={submitApp.isPending}>{submitApp.isPending ? 'Submitting…' : 'Submit for review'} <ArrowRight size={16}/></Button></div></form>}
+        {(admin || profile.role === 'admin') ? (
+          <div className="panel admin-access-card">
+            <div className="panel-head">
+              <div><p className="section-kicker">EXECUTIVE MANAGEMENT</p><h2>Verified Agency Administrator</h2></div>
+              <span className="privacy-note"><ShieldCheck size={15}/> System Administrator</span>
+            </div>
+            <p style={{ marginTop: '0.6rem', color: '#445b51', lineHeight: '1.6' }}>
+              You are signed in as the master agency administrator for TRENDIE MODELS Ghana (<b>{profile.email}</b>). From your management console, you oversee model recruitment, evaluate portfolio applications, issue task assignments, publish community announcements, and manage member communications.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem', flexWrap: 'wrap' }}>
+              <Link href="/applications" className="button button-primary">Review Applications <ArrowRight size={15}/></Link>
+              <Link href="/models" className="button button-outline">Manage Roster</Link>
+              <Link href="/announcements" className="button button-outline">Post Announcements</Link>
+              <Link href="/audit-logs" className="button button-quiet">View Audit Log</Link>
+            </div>
+          </div>
+        ) : (
+          ['not_submitted', 'rejected'].includes(profile.application_status) && (
+            <form className="panel application-submit" onSubmit={application}>
+              <div><p className="section-kicker">YOUR APPLICATION</p><h2>{profile.application_status === 'rejected' ? 'Update your application' : 'Ready to introduce yourself?'}</h2><p>Tell our team what you’re hoping to explore. Your details stay private while we review.</p></div>
+              <Field label="Why would you like to join TRENDIE MODELS?"><textarea maxLength={2000} rows={4} value={statement} onChange={e => setStatement(e.target.value)} placeholder="A few words in your own voice"/></Field>
+              <div className="form-footer"><span>Application status: <Pill status={profile.application_status}/></span><Button disabled={submitApp.isPending}>{submitApp.isPending ? 'Submitting…' : 'Submit for review'} <ArrowRight size={16}/></Button></div>
+            </form>
+          )
+        )}
         <div className="panel portfolio-panel">
           <div><p className="section-kicker">PORTFOLIO MATERIALS</p><h2>Your work, thoughtfully presented.</h2><p>Images are stored privately. Profile photos up to 5 MB; portfolio images up to 15 MB.</p><PrivateGallery paths={profile.portfolio_paths || []} bucket="portfolio" label="Portfolio images"/></div>
           <StorageUpload profile={profile} kind="portfolio"/>
@@ -998,7 +1022,7 @@ function Announcements({ admin }: { admin:boolean }) {
   };
   const openNew=()=>{setEditing(null);setForm(emptyForm);setNotice('');setOpen(true);};
   const save=(e:FormEvent)=>{e.preventDefault();if(form.audience==='selected'&&form.recipient_ids.length===0){setNotice('Choose at least one approved member for this announcement.');return;}const data={...form,title:form.title.trim(),body:form.body.trim(),status:form.status as 'draft'|'published',audience:form.audience as 'all'|'selected'};const onSuccess=()=>{void qc.invalidateQueries({queryKey:getListAnnouncementsQueryKey()});reset();};const onError=()=>setNotice('The announcement could not be saved. Please try again.');if(editing)update.mutate({id:editing,data},{onSuccess,onError});else create.mutate({data},{onSuccess,onError});};
-  return <><PageTitle eyebrow={admin?'COMMUNITY COMMS':'AGENCY BULLETIN'} title="Announcements" description={admin?'Keep the agency connected with clear, timely updates.':'News and notes from the TRENDIE MODELS team.'} action={admin?<Button onClick={openNew}><Plus size={16}/> New announcement</Button>:undefined}/>{q.isLoading?<LoadingState/>:q.isError?<ErrorState retry={()=>q.refetch()}/>:q.data?.length?<div className="announcement-list">{q.data.map(a=><article className="panel announcement-card" key={a.id}><div className="announcement-card-top"><span className="announcement-mark"><BookOpen/></span><Pill status={a.status}/><small>{fmt(a.published_at||a.created_at)}</small></div><h2>{a.title}</h2><p>{a.body}</p><div className="announcement-card-foot">{!admin&&!a.is_read&&<Button variant="outline" onClick={()=>mark.mutate({id:a.id},{onSuccess:()=>qc.invalidateQueries({queryKey:getListAnnouncementsQueryKey()})})}>Mark as read <Check size={14}/></Button>}{admin&&<div className="announcement-admin"><span>Audience: {a.audience === 'selected' ? `${a.recipient_ids?.length || 0} selected members` : 'All members'}</span><Button variant="quiet" onClick={()=>{setEditing(a.id);setForm({title:a.title,body:a.body,status:a.status==='archived'?'draft':a.status,audience:a.audience,recipient_ids:a.recipient_ids||[]});setNotice('');setOpen(true);}}>Edit</Button>{a.status!=='archived'&&<Button variant="quiet" onClick={()=>{if(window.confirm(`Archive “${a.title}”?`))update.mutate({id:a.id,data:{status:'archived'}},{onSuccess:()=>qc.invalidateQueries({queryKey:getListAnnouncementsQueryKey()}),onError:()=>setNotice('This announcement could not be archived. Please try again.')});}}>Archive</Button>}<Button variant="quiet" className="delete-btn" onClick={()=>deleteAnnouncement(a.id, a.title)}><Trash2 size={14}/> Delete</Button></div>}</div></article>)}</div>:<EmptyState title="No announcements yet." body={admin?'When the team shares an update, it will appear here.':'When the agency has news to share, it will appear here.'} action={admin?<Button onClick={openNew}><Plus size={15}/> Write an update</Button>:undefined}/>}
+  return <><PageTitle eyebrow={admin?'COMMUNITY COMMS':'AGENCY BULLETIN'} title="Announcements" description={admin?'Keep the agency connected with clear, timely updates.':'News and notes from the TRENDIE MODELS team.'} action={admin?<Button onClick={openNew}><Plus size={16}/> New announcement</Button>:undefined}/>{q.isLoading?<LoadingState/>:q.isError?<ErrorState retry={()=>q.refetch()}/>:q.data?.length?<div className="announcement-list">{q.data.map(a=><article className="panel announcement-card" key={a.id}><div className="announcement-card-top"><span className="announcement-mark"><BookOpen/></span><Pill status={a.status}/><small>{fmt(a.published_at||a.created_at)}</small></div><h2>{a.title}</h2><p>{a.body}</p><div className="announcement-card-foot">{!admin&&!a.is_read&&<Button variant="outline" onClick={()=>mark.mutate({id:a.id},{onSuccess:()=>qc.invalidateQueries({queryKey:getListAnnouncementsQueryKey()})})}>Mark as read <Check size={14}/></Button>}{admin&&<div className="announcement-admin"><span>Audience: {a.audience === 'selected' ? `${a.recipient_ids?.length || 0} selected members` : 'All members'}</span><Button variant="quiet" onClick={()=>{setEditing(a.id);setForm({title:a.title,body:a.body,status:a.status==='archived'?'draft':a.status,audience:a.audience,recipient_ids:a.recipient_ids||[]});setNotice('');setOpen(true);}}>Edit</Button>{a.status!=='archived'&&<Button variant="quiet" onClick={()=>{if(window.confirm(`Archive “${a.title}”?`))update.mutate({id:a.id,data:{status:'archived'}},{onSuccess:()=>qc.invalidateQueries({queryKey:getListAnnouncementsQueryKey()}),onError:()=>setNotice('This announcement could not be archived. Please try again.')});}}>Archive</Button>}<Button variant="quiet" className="delete-btn" onClick={()=>deleteAnnouncement(a.id, a.title)}><Trash2 size={14}/> Delete</Button></div>}</div></article>)}</div>:<EmptyState title="Welcome to Trendie" body="Prepare for your portfolio shoot at a cost of 100 Ghana Cedis. Ensure all your profile details, contact numbers, and measurements are kept up to date." action={admin?<Button onClick={openNew}><Plus size={15}/> Write an update</Button>:undefined}/>}
     {open&&<div className="modal-backdrop"><form className="modal modal-wide" onSubmit={save}><button type="button" className="modal-close" onClick={reset} aria-label="Close"><X/></button><p className="section-kicker">AGENCY BULLETIN</p><h2>{editing?'Edit announcement':'Share an update.'}</h2><Field label="Headline"><input required minLength={2} maxLength={160} value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/></Field><Field label="Message"><textarea required minLength={2} maxLength={8000} rows={6} value={form.body} onChange={e=>setForm({...form,body:e.target.value})}/></Field><div className="form-grid"><Field label="Status"><select value={form.status} onChange={e=>setForm({...form,status:e.target.value})}><option value="published">Publish now</option><option value="draft">Save draft</option></select></Field><Field label="Audience"><select value={form.audience} onChange={e=>setForm({...form,audience:e.target.value})}><option value="all">All members</option><option value="selected">Selected members</option></select></Field></div>{form.audience==='selected'&&<Field label="Recipients (approved models)"><select multiple size={5} value={form.recipient_ids} disabled={models.isLoading||models.isError} onChange={e=>setForm({...form,recipient_ids:Array.from(e.target.selectedOptions,o=>o.value)})}>{models.data?.map(model=><option value={model.id} key={model.id}>{model.full_name} · {model.email}</option>)}</select></Field>}{models.isError&&form.audience==='selected'&&<p className="form-notice" role="alert">The approved-model list could not be loaded.</p>}{notice&&<p className="form-notice" role="alert">{notice}</p>}<div className="modal-actions"><Button variant="outline" type="button" onClick={reset}>Cancel</Button><Button disabled={create.isPending||update.isPending||(form.audience==='selected'&&models.isError)}>{create.isPending||update.isPending?'Saving…':'Save announcement'} <ArrowRight size={15}/></Button></div></form></div>}</>;
 }
 
@@ -1024,11 +1048,70 @@ function Messages({ profile, admin }: { profile:AgencyProfile; admin:boolean }) 
     <form className="panel new-conversation" onSubmit={start}><div><p className="section-kicker">START A PRIVATE THREAD</p><h2>Send a first note</h2><p>{admin?'Start a one-to-one conversation with any applicant or approved model.':'Choose an agency contact for a private message.'}</p></div><div className="new-convo-fields"><Field label={admin?'Applicant or approved model':'Agency contact'}><select required value={recipient} onChange={e=>setRecipient(e.target.value)} disabled={directoryLoading||directoryError}><option value="">{directoryLoading?'Loading contacts…':'Choose a recipient'}</option>{options.map(person=><option value={person.id} key={person.id}>{person.name}</option>)}</select></Field><Field label="Subject (optional)"><input maxLength={160} value={title} onChange={e=>setTitle(e.target.value)} placeholder="What would you like to discuss?"/></Field><Field label="First message"><input required minLength={1} maxLength={4000} value={firstMessage} onChange={e=>setFirstMessage(e.target.value)} placeholder="Write your opening message"/></Field><Button disabled={create.isPending||directoryLoading||directoryError||options.length===0}>{create.isPending?'Starting…':'Start conversation'} <ArrowRight size={15}/></Button></div>{directoryError&&<p className="form-notice" role="alert">The contact list could not be loaded. Please refresh or contact the agency.</p>}{!directoryLoading&&!directoryError&&options.length===0&&<p className="quiet-line">No available contacts were found.</p>}{notice&&<p className="form-notice" role="alert">{notice}</p>}</form></>;
 }
 
-function Notifications({ userId }: { userId: string }) {
-  const qc=useQueryClient(); const q=useListNotifications(); const mark=useMarkNotificationsRead();
-  useEffect(()=>{const client=supabase;if(!client)return;const channel=client.channel(`notifications-${userId}`).on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:`user_id=eq.${userId}`},()=>{void qc.invalidateQueries({queryKey:getListNotificationsQueryKey()});void qc.invalidateQueries({queryKey:getGetDashboardQueryKey()});}).subscribe();return()=>{void client.removeChannel(channel);};},[qc,userId]);
-  const unread=q.data?.filter(n=>!n.is_read).map(n=>n.id)||[];
-  return <><PageTitle title="Notifications" description="Important updates from your agency, in one place." action={unread.length?<Button variant="outline" onClick={()=>mark.mutate({data:{ids:unread}},{onSuccess:()=>qc.invalidateQueries({queryKey:getListNotificationsQueryKey()})})} disabled={mark.isPending}>Mark all read <Check size={15}/></Button>:undefined}/>{q.isLoading?<LoadingState/>:q.isError?<ErrorState retry={()=>q.refetch()}/>:q.data?.length?<div className="notification-list">{q.data.map(n=><article className={`panel notification-card ${n.is_read?'notification-read':''}`} key={n.id}><span className="notification-mark"><Bell size={17}/></span><div><div className="notification-heading"><h2>{n.title}</h2>{!n.is_read&&<i/>}</div>{n.body&&<p>{n.body}</p>}<small>{fmt(n.created_at)} · {n.kind}</small></div>{n.link&&<Link href={n.link} className="panel-link">Open <ArrowUpRight size={15}/></Link>}</article>)}</div>:<EmptyState title="All caught up." body="New agency updates and reminders will find their way here."/>}</>;
+function Notifications({ userId, admin = false }: { userId: string; admin?: boolean }) {
+  const qc = useQueryClient();
+  const q = useListNotifications();
+  const mark = useMarkNotificationsRead();
+  const dashboard = useGetDashboard({ query: { enabled: admin, queryKey: getGetDashboardQueryKey() } });
+  useEffect(() => {
+    const client = supabase;
+    if (!client) return;
+    const channel = client.channel(`notifications-${userId}`).on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}`
+    }, () => {
+      void qc.invalidateQueries({ queryKey: getListNotificationsQueryKey() });
+      void qc.invalidateQueries({ queryKey: getGetDashboardQueryKey() });
+    }).subscribe();
+    return () => { void client.removeChannel(channel); };
+  }, [qc, userId]);
+  const unread = q.data?.filter(n => !n.is_read).map(n => n.id) || [];
+  return (
+    <>
+      <PageTitle
+        title={admin ? "Agency Operations & Notifications" : "Notifications"}
+        eyebrow={admin ? "AGENCY DISPATCH" : "UPDATES"}
+        description={admin ? "Real-time alerts, operational queues, and system updates for TRENDIE MODELS management." : "Important updates from your agency, in one place."}
+        action={unread.length ? <Button variant="outline" onClick={() => mark.mutate({ data: { ids: unread } }, { onSuccess: () => qc.invalidateQueries({ queryKey: getListNotificationsQueryKey() }) })} disabled={mark.isPending}>Mark all read <Check size={15}/></Button> : undefined}
+      />
+      {admin && dashboard.data && (
+        <div className="admin-notification-alerts" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+          <div className="panel" style={{ padding: '1.25rem', borderLeft: '4px solid #be945e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <p className="section-kicker" style={{ margin: 0 }}>APPLICATIONS QUEUE</p>
+              <h3 style={{ margin: '0.25rem 0', fontSize: '1.1rem' }}>{dashboard.data.pending_applications} Pending Review</h3>
+              <small style={{ color: '#68776f' }}>Applicants waiting for agency decision</small>
+            </div>
+            <Link href="/applications" className="button button-outline" style={{ fontSize: '11px', minHeight: '34px', padding: '0 12px' }}>Review</Link>
+          </div>
+          <div className="panel" style={{ padding: '1.25rem', borderLeft: '4px solid #2d453b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <p className="section-kicker" style={{ margin: 0 }}>SUPPORT DESK</p>
+              <h3 style={{ margin: '0.25rem 0', fontSize: '1.1rem' }}>{dashboard.data.support_requests} Active Inquiries</h3>
+              <small style={{ color: '#68776f' }}>Support tickets from models and applicants</small>
+            </div>
+            <Link href="/support" className="button button-outline" style={{ fontSize: '11px', minHeight: '34px', padding: '0 12px' }}>Open Desk</Link>
+          </div>
+        </div>
+      )}
+      {q.isLoading ? <LoadingState/> : q.isError ? <ErrorState retry={() => q.refetch()}/> : q.data?.length ? (
+        <div className="notification-list">
+          {q.data.map(n => (
+            <article className={`panel notification-card ${n.is_read ? 'notification-read' : ''}`} key={n.id}>
+              <span className="notification-mark"><Bell size={17}/></span>
+              <div>
+                <div className="notification-heading"><h2>{n.title}</h2>{!n.is_read && <i/>}</div>
+                {n.body && <p>{n.body}</p>}
+                <small>{fmt(n.created_at)} · {n.kind}</small>
+              </div>
+              {n.link && <Link href={n.link} className="panel-link">Open <ArrowUpRight size={15}/></Link>}
+            </article>
+          ))}
+        </div>
+      ) : (
+        <EmptyState title="All caught up." body={admin ? "No new personal notifications. Operational queues above show real-time agency items." : "New agency updates and reminders will find their way here."}/>
+      )}
+    </>
+  );
 }
 
 function Tracker() {
