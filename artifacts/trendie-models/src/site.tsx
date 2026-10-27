@@ -451,8 +451,8 @@ export function PublicHome() {
                 Whether you are applying for representation or inquiring about booking our models for upcoming campaigns, our management team is here to assist.
               </p>
               <div className="contact-numbers">
-                <a href="mailto:hellotrendie@gmail.com" className="contact-phone-item">
-                  <Mail size={16}/> hellotrendie@gmail.com
+                <a href="mailto:hellotrendiemodels@gmail.com" className="contact-phone-item">
+                  <Mail size={16}/> hellotrendiemodels@gmail.com
                 </a>
                 <a href="https://wa.me/233267730824" target="_blank" rel="noreferrer" className="contact-phone-item">
                   <span className="whatsapp-pill">WhatsApp</span> +233 26 773 0824
@@ -481,7 +481,7 @@ export function PublicHome() {
         <div>
           <Link href="/sign-up">Apply to join</Link>
           <Link href="/sign-in">Member sign in</Link>
-          <a href="mailto:hellotrendie@gmail.com">hellotrendie@gmail.com</a>
+          <a href="mailto:hellotrendiemodels@gmail.com">hellotrendiemodels@gmail.com</a>
         </div>
         <small>© {new Date().getFullYear()} TRENDIE MODELS GHANA · ACCRA, GHANA · ALL RIGHTS RESERVED</small>
       </footer>
