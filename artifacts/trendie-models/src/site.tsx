@@ -49,6 +49,25 @@ export function PublicHome() {
   const [, go] = useLocation();
   return (
     <div className="landing">
+      {/* TOP ANNOUNCEMENT & CONTACT BAR */}
+      <div className="agency-top-bar">
+        <div className="wrap agency-top-bar-content">
+          <div className="agency-top-left">
+            <span className="agency-top-pill">AGENCY CONTACT</span>
+            <a href="mailto:hellotrendiemodels@gmail.com" className="agency-top-email">
+              <Mail size={13}/> <span>hellotrendiemodels@gmail.com</span>
+            </a>
+            <span className="agency-top-dot">·</span>
+            <a href="https://wa.me/233267730824" target="_blank" rel="noreferrer" className="agency-top-phone">
+              WhatsApp: +233 26 773 0824
+            </a>
+          </div>
+          <div className="agency-top-right">
+            <span>Accra, Ghana · Discover · Develop · Represent</span>
+          </div>
+        </div>
+      </div>
+
       <header className="public-nav wrap">
         <Brand />
         <nav>
@@ -62,6 +81,9 @@ export function PublicHome() {
           <a href="#contact">Contact</a>
         </nav>
         <div className="nav-actions">
+          <a href="mailto:hellotrendiemodels@gmail.com" className="nav-email-link" title="Official Agency Email">
+            <Mail size={13}/> <span>hellotrendiemodels@gmail.com</span>
+          </a>
           {auth.userId ? (
             <>
               <Link href="/dashboard" className="button button-outline">Dashboard</Link>
@@ -102,6 +124,12 @@ export function PublicHome() {
               <span className="req-tag">Call For Models</span>
               <span className="req-text">Females · Ages 18 – 30 · All Nationalities · All Heights Welcome</span>
             </div>
+            <div className="hero-contact-strip">
+              <span className="strip-label"><Mail size={14}/> Official Agency Email:</span>
+              <a href="mailto:hellotrendiemodels@gmail.com" className="strip-email">
+                hellotrendiemodels@gmail.com
+              </a>
+            </div>
             <div className="hero-buttons">
               <Link href="/sign-up" className="button button-primary button-large">
                 Start your application <ArrowRight size={17}/>
@@ -118,7 +146,7 @@ export function PublicHome() {
           <div className="hero-art">
             <div className="hero-image">
               <img
-                src="/trendie-hero.png"
+                src="/trendie-hero-duo.jpg"
                 alt="TRENDIE MODELS — High-fashion editorial Black female and male models together, Accra Ghana"
                 fetchPriority="high"
               />
@@ -451,8 +479,8 @@ export function PublicHome() {
                 Whether you are applying for representation or inquiring about booking our models for upcoming campaigns, our management team is here to assist.
               </p>
               <div className="contact-numbers">
-                <a href="mailto:hellotrendiemodels@gmail.com" className="contact-phone-item">
-                  <Mail size={16}/> hellotrendiemodels@gmail.com
+                <a href="mailto:hellotrendiemodels@gmail.com" className="contact-phone-item contact-email-primary">
+                  <Mail size={18}/> <b>hellotrendiemodels@gmail.com</b>
                 </a>
                 <a href="https://wa.me/233267730824" target="_blank" rel="noreferrer" className="contact-phone-item">
                   <span className="whatsapp-pill">WhatsApp</span> +233 26 773 0824
