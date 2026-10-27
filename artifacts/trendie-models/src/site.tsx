@@ -45,17 +45,428 @@ function Brand({ light = false }: { light?: boolean }) { return <Link href="/" c
 function Button({ children, variant = 'primary', className = '', ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'outline' | 'secondary' | 'quiet' }) { return <button className={`button button-${variant} ${className}`} {...props}>{children}</button>; }
 
 export function PublicHome() {
-  return <div className="landing">
-    <header className="public-nav wrap"><Brand/><nav><a href="#agency">Our agency</a><a href="#opportunities">Opportunities</a><a href="#journey">How it works</a><a href="#contact">Contact</a></nav><div className="nav-actions"><Link href="/sign-in" className="nav-signin">Sign in</Link><Link href="/sign-up" className="button button-primary">Join the agency <ArrowRight size={16}/></Link></div></header>
-    <main>
-      <section className="hero"><div className="hero-copy wrap"><div className="eyebrow"><i/> A modelling community rooted in Accra</div><h1>Where your story<br/>meets <em>the frame.</em></h1><p className="hero-lede">A premium home for models who are ready to grow. Find your people, build your portfolio, and step into every opportunity with confidence.</p><div className="hero-buttons"><Link href="/sign-up" className="button button-primary button-large">Start your application <ArrowRight size={17}/></Link><a href="#agency" className="text-link">Get to know us <ChevronRight size={16}/></a></div><div className="hero-proof"><span/><p>Built in Accra. Made for the world.</p></div></div><div className="hero-art"><div className="hero-image"><img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1200&q=85&fit=crop&crop=faces,top" alt="TRENDIE MODELS — editorial portrait" fetchPriority="high"/></div><div className="hero-stamp"><b>TM</b><small>ACCRA<br/>GHANA</small></div><div className="hero-caption">01 / THE TRENDIE WAY</div></div></section>
-      <section id="agency" className="intro-section"><div className="wrap intro-grid"><p className="section-kicker">01 — WHO WE ARE</p><div><h2>Good representation<br/>starts with <em>good people.</em></h2><p className="intro-text">TRENDIE MODELS is an Accra-based modeling agency built around a simple belief: every model deserves to be seen, supported, and treated with respect. We create a professional space where talent can take shape at its own pace.</p><Link href="/sign-up" className="text-link">Meet your next chapter <ArrowRight size={16}/></Link></div><div className="intro-note"><span/><p>Local perspective.<br/>Ambitious outlook.<br/>People, always.</p></div></div></section>
-      <section id="opportunities" className="opportunities wrap"><div className="section-heading"><div><p className="section-kicker">02 — WHERE YOU CAN GO</p><h2>Room to find<br/><em>your lane.</em></h2></div><p>We connect promising talent with the right next steps—through guidance, practical experience, and real conversations.</p></div><div className="opportunity-list"><article><span>01</span><div><h3>Editorial &amp; fashion</h3><p>Develop your point of view and build experience across creative shoots and fashion stories.</p></div><ArrowUpRight/></article><article><span>02</span><div><h3>Commercial &amp; brand</h3><p>Meet brands looking for fresh, grounded talent with a strong sense of self.</p></div><ArrowUpRight/></article><article><span>03</span><div><h3>Skills &amp; development</h3><p>Practice the details: posing, presence, professionalism, and portfolio building.</p></div><ArrowUpRight/></article></div></section>
-      <section id="journey" className="journey-section"><div className="wrap journey-grid"><div className="journey-heading"><p className="section-kicker">03 — YOUR FIRST STEPS</p><h2>A clear path.<br/><em>People beside you.</em></h2><p>Start where you are. Our team reviews every application with care and will keep you informed along the way.</p><Link href="/sign-up" className="button button-primary">Apply to join <ArrowRight size={16}/></Link></div><div className="steps">{[['01','Introduce yourself','Create an account and tell us a little about you, your interests, and what brings you here.'],['02','Share your application','Add your details and portfolio materials. Your application stays private with our review team.'],['03','Hear from our team','We\u2019ll review your application and share a decision, with useful feedback where we can.'],['04','Grow together','Approved members get a personal dashboard for tasks, announcements, and agency support.']].map(([n,t,d])=><div className="step" key={n}><span>{n}</span><div><h3>{t}</h3><p>{d}</p></div></div>)}</div></div></section>
-      <section className="benefits wrap"><div className="benefit-lead"><p className="section-kicker">04 — MORE THAN A ROSTER</p><h2>Professional.<br/><em>Personal.</em></h2></div><div className="benefit-content"><p>We want your agency experience to feel clear and human. That means practical tools, honest communication, and a team that knows you're a person before you're a portfolio.</p><div className="benefit-points"><article><CheckCircle2/><h3>Guidance that travels with you</h3><p>Keep your profile, experience, and portfolio in one place as your work develops.</p></article><article><MessageCircle/><h3>A direct line to your team</h3><p>Private messages and support requests make it easier to ask questions and stay connected.</p></article><article><Target/><h3>Progress you can see</h3><p>Follow assignments, daily habits, and milestones from your member dashboard.</p></article></div></div></section>
-      <section id="contact" className="contact-section"><div className="wrap contact-grid"><div><p className="section-kicker">05 — LET'S TALK</p><h2>Questions before<br/><em>you begin?</em></h2></div><div><p>We're happy to help you understand the process, prepare your application, or find the right person to speak with.</p><a href="mailto:hellotrendiemodels@gmail.com" className="contact-email"><Mail size={17}/> hellotrendiemodels@gmail.com <ArrowUpRight size={16}/></a><p className="contact-small">Agency enquiries and applicant support · Accra, Ghana</p></div></div></section>
-    </main><footer className="public-footer wrap"><Brand/><p>Representation, with care.</p><div><Link href="/sign-up">Apply to join</Link><Link href="/sign-in">Member sign in</Link><a href="mailto:hellotrendiemodels@gmail.com">Contact</a></div><small>© {new Date().getFullYear()} TRENDIE MODELS · ACCRA, GHANA</small></footer>
-  </div>;
+  return (
+    <div className="landing">
+      <header className="public-nav wrap">
+        <Brand />
+        <nav>
+          <a href="#agency">About</a>
+          <a href="#drives">Values</a>
+          <a href="#partnership">Partnership</a>
+          <a href="#departments">Departments</a>
+          <a href="#journey">Journey</a>
+          <a href="#standards">Standards</a>
+          <a href="#team">Team</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <div className="nav-actions">
+          <Link href="/sign-in" className="nav-signin">Sign in</Link>
+          <Link href="/sign-up" className="button button-primary">Join the agency <ArrowRight size={16}/></Link>
+        </div>
+      </header>
+
+      <main>
+        {/* HERO SECTION */}
+        <section className="hero">
+          <div className="hero-copy wrap">
+            <div className="eyebrow">
+              <i/> WHERE TALENT MEETS OPPORTUNITY · ACCRA, GHANA
+            </div>
+            <h1>
+              Where Emerging Talent<br/>Meets <em>Global Opportunity.</em>
+            </h1>
+            <p className="hero-lede">
+              Trendie Models Ghana is a professional modeling and talent development agency based in Accra, dedicated to discovering, developing, and representing emerging talent. At Trendie Models, modeling is more than appearance — it is about confidence, discipline, professionalism, and representing brands with excellence.
+            </p>
+            <div className="requirements-callout">
+              <span className="req-tag">Call For Models</span>
+              <span className="req-text">Females · Ages 18 – 30 · All Nationalities · All Heights Welcome</span>
+            </div>
+            <div className="hero-buttons">
+              <Link href="/sign-up" className="button button-primary button-large">
+                Start your application <ArrowRight size={17}/>
+              </Link>
+              <a href="#departments" className="text-link">
+                Explore departments <ChevronRight size={16}/>
+              </a>
+            </div>
+            <div className="hero-proof">
+              <span/>
+              <p>Discover · Develop · Represent · Create Opportunities</p>
+            </div>
+          </div>
+          <div className="hero-art">
+            <div className="hero-image">
+              <img
+                src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1200&q=85&fit=crop&crop=faces,top"
+                alt="TRENDIE MODELS — editorial portrait"
+                fetchPriority="high"
+              />
+            </div>
+            <div className="hero-stamp">
+              <b>TM</b>
+              <small>ACCRA<br/>GHANA</small>
+            </div>
+            <div className="hero-caption">01 / WHERE TALENT MEETS OPPORTUNITY</div>
+          </div>
+        </section>
+
+        {/* FOUR PILLARS BAR */}
+        <div className="pillars-bar">
+          <div className="wrap pillars-grid">
+            <div className="pillar-item">
+              <span>PILLAR 01</span>
+              <b>Discover</b>
+            </div>
+            <div className="pillar-item">
+              <span>PILLAR 02</span>
+              <b>Develop</b>
+            </div>
+            <div className="pillar-item">
+              <span>PILLAR 03</span>
+              <b>Represent</b>
+            </div>
+            <div className="pillar-item">
+              <span>PILLAR 04</span>
+              <b>Create Opportunities</b>
+            </div>
+          </div>
+        </div>
+
+        {/* 01 WHO WE ARE */}
+        <section id="agency" className="intro-section">
+          <div className="wrap intro-grid">
+            <p className="section-kicker">01 — WHO WE ARE</p>
+            <div>
+              <h2>Good representation<br/>starts with <em>good people.</em></h2>
+              <p className="intro-text">
+                Trendie Models Ghana is a professional modeling and talent development agency based in Accra, dedicated to discovering, developing, and representing emerging talent. We create opportunities for individuals who aspire to build careers in fashion, commercial modeling, brand representation, media, and entertainment.
+              </p>
+              <p className="intro-text" style={{ marginTop: '-8px' }}>
+                At Trendie Models, modeling is more than appearance. It is about confidence, discipline, professionalism, and the ability to represent a brand with excellence.
+              </p>
+              <Link href="/sign-up" className="text-link">
+                Meet your next chapter <ArrowRight size={16}/>
+              </Link>
+            </div>
+            <div className="intro-note">
+              <span/>
+              <p>Local perspective.<br/>Ambitious outlook.<br/>People, always.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* 02 WHAT DRIVES US: MISSION, VISION & CORE VALUES */}
+        <section id="drives" className="drives-section wrap">
+          <div>
+            <p className="section-kicker">02 — WHAT DRIVES US</p>
+            <h2>Mission, Vision &amp;<br/><em>Core Values</em></h2>
+          </div>
+          <div className="mission-vision-grid">
+            <div className="drive-card">
+              <span>OUR MISSION</span>
+              <h3>Meaningful pathways to sustainable careers.</h3>
+              <p>
+                To discover, develop, and professionally represent modeling talent while creating meaningful opportunities for models to build sustainable careers.
+              </p>
+            </div>
+            <div className="drive-card">
+              <span>OUR VISION</span>
+              <h3>Connecting Ghanaian talent to the world.</h3>
+              <p>
+                To become a leading modeling agency in Ghana, recognized for developing exceptional talent and connecting Ghanaian models to opportunities locally and internationally.
+              </p>
+            </div>
+          </div>
+          <div className="values-head">
+            <p className="section-kicker">OUR PILLARS OF EXCELLENCE</p>
+            <h3>Core values that guide our work</h3>
+          </div>
+          <div className="values-grid">
+            <div className="value-card">
+              <span className="value-num">01 / VALUES</span>
+              <h4>Excellence</h4>
+              <p>We pursue high standards in everything we do, from training to runway representation.</p>
+            </div>
+            <div className="value-card">
+              <span className="value-num">02 / VALUES</span>
+              <h4>Professionalism</h4>
+              <p>We prepare our models to conduct themselves with confidence, discipline, and respect.</p>
+            </div>
+            <div className="value-card">
+              <span className="value-num">03 / VALUES</span>
+              <h4>Integrity</h4>
+              <p>We value honesty, transparency, and responsible representation across every engagement.</p>
+            </div>
+            <div className="value-card">
+              <span className="value-num">04 / VALUES</span>
+              <h4>Confidence</h4>
+              <p>We help individuals recognize their true potential and express it with radiant confidence.</p>
+            </div>
+            <div className="value-card">
+              <span className="value-num">05 / VALUES</span>
+              <h4>Discipline</h4>
+              <p>We believe consistency, punctuality, and unwavering commitment are essential to success.</p>
+            </div>
+            <div className="value-card">
+              <span className="value-num">06 / VALUES</span>
+              <h4>Opportunity</h4>
+              <p>We aim to create genuine pathways for talent to grow, earn, and succeed on global stages.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* 03 CREATIVE PARTNERSHIP */}
+        <section id="partnership" className="partnership-section">
+          <div className="wrap partnership-grid">
+            <div className="partnership-copy">
+              <p className="section-kicker">03 — CREATIVE PARTNERSHIP</p>
+              <h2>Trendie Models ×<br/><em>Kwesi Arthur Pixel</em></h2>
+              <p className="partnership-lead">
+                Trendie Models Ghana is partnering with Kwesi Arthur Pixel to strengthen the visual development and professional presentation of our models. This collaboration brings together agency expertise and creative photography to build compelling visual identities for our talent.
+              </p>
+              <div className="partnership-features">
+                <div className="partnership-feature-item">
+                  <Check size={14}/>
+                  <span>Professional Model Photography</span>
+                </div>
+                <div className="partnership-feature-item">
+                  <Check size={14}/>
+                  <span>Portfolio Development</span>
+                </div>
+                <div className="partnership-feature-item">
+                  <Check size={14}/>
+                  <span>Creative Direction</span>
+                </div>
+                <div className="partnership-feature-item">
+                  <Check size={14}/>
+                  <span>Model Branding</span>
+                </div>
+                <div className="partnership-feature-item">
+                  <Check size={14}/>
+                  <span>Professional Visual Content</span>
+                </div>
+                <div className="partnership-feature-item">
+                  <Check size={14}/>
+                  <span>Campaign &amp; Promotional Content</span>
+                </div>
+              </div>
+            </div>
+            <div className="partnership-badge-wrap">
+              <div className="partnership-box">
+                <small>Official Visual Development</small>
+                <h3>High-Caliber Imagery for Every Model</h3>
+                <p>
+                  Every approved talent undergoes professional comp card shoots, editorial creative direction, and campaign packaging.
+                </p>
+                <Link href="/sign-up" className="button button-primary">
+                  Begin your portfolio <ArrowRight size={15}/>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 04 OUR DEPARTMENTS */}
+        <section id="departments" className="departments-section">
+          <div className="wrap">
+            <div className="section-heading">
+              <div>
+                <p className="section-kicker">04 — OUR DEPARTMENTS</p>
+                <h2>Areas of Representation<br/><em>&amp; Industry Focus</em></h2>
+              </div>
+              <p>
+                Trendie Models develops and represents talent across multiple areas of the modeling and creative industry.
+              </p>
+            </div>
+            <div className="departments-grid">
+              <article className="dept-card">
+                <span className="dept-num">DEPARTMENT 01</span>
+                <h3>Fashion &amp; Runway</h3>
+                <p>Models prepared for runway shows, fashion weeks, designer presentations, and high-profile fashion events.</p>
+              </article>
+              <article className="dept-card">
+                <span className="dept-num">DEPARTMENT 02</span>
+                <h3>Commercial Modeling</h3>
+                <p>Models for advertisements, product campaigns, lifestyle campaigns, and commercial video productions.</p>
+              </article>
+              <article className="dept-card">
+                <span className="dept-num">DEPARTMENT 03</span>
+                <h3>Editorial</h3>
+                <p>Models for high-fashion editorials, magazines, creative campaigns, and professional fashion photography.</p>
+              </article>
+              <article className="dept-card">
+                <span className="dept-num">DEPARTMENT 04</span>
+                <h3>Brand Ambassadors</h3>
+                <p>Models representing luxury and consumer brands at campaigns, product activations, launches, and promotional events.</p>
+              </article>
+              <article className="dept-card">
+                <span className="dept-num">DEPARTMENT 05</span>
+                <h3>Influencer &amp; Digital Talent</h3>
+                <p>Talent suited for digital campaigns, social media storytelling, and creator-led brand collaborations.</p>
+              </article>
+              <article className="dept-card">
+                <span className="dept-num">DEPARTMENT 06</span>
+                <h3>Events &amp; Promotional</h3>
+                <p>Professional talent for luxury events, trade exhibitions, brand activations, and promotional campaigns.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        {/* 05 THE 7-STEP JOURNEY */}
+        <section id="journey" className="journey-section">
+          <div className="wrap journey-grid">
+            <div className="journey-heading">
+              <p className="section-kicker">05 — FROM APPLICATION TO OPPORTUNITY</p>
+              <h2>A clear, structured path<br/>from discovery to <em>representation.</em></h2>
+              <p>
+                We guide each model step by step — from your first photo submission through training, portfolio shoots, and professional brand bookings.
+              </p>
+              <Link href="/sign-up" className="button button-primary">
+                Apply to join <ArrowRight size={16}/>
+              </Link>
+            </div>
+            <div className="steps">
+              {[
+                ['01', 'Application', 'Applicants submit their required personal details and initial photographs.'],
+                ['02', 'Screening', 'Applications are carefully reviewed based on suitability, presentation, and raw potential.'],
+                ['03', 'Interview / Assessment', 'Selected applicants are invited for further physical assessment and discovery conversation.'],
+                ['04', 'Portfolio Development', 'Successful talent receives professional guidance, creative direction, and visual development.'],
+                ['05', 'Training & Orientation', 'Models are introduced to professional expectations, runway walk, posing, grooming, communication, and industry standards.'],
+                ['06', 'Agency Representation', 'Approved models become part of the exclusive Trendie Models talent pool and are actively promoted.'],
+                ['07', 'Bookings & Opportunities', 'Models are presented for appropriate fashion, commercial, promotional, and creative opportunities.'],
+              ].map(([n, t, d]) => (
+                <div className="step" key={n}>
+                  <span>{n}</span>
+                  <div>
+                    <h3>{t}</h3>
+                    <p>{d}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 06 PROFESSIONALISM: 10 STANDARDS */}
+        <section id="standards" className="standards-section wrap">
+          <div>
+            <p className="section-kicker">06 — PROFESSIONALISM STARTS HERE</p>
+            <h2>The 10 Core Agency<br/><em>Professional Standards</em></h2>
+            <p style={{ maxWidth: '640px', color: '#68756d', fontSize: '14px', lineHeight: '1.8', margin: '14px 0 0' }}>
+              Being represented by Trendie Models means understanding that your conduct, attitude, and professionalism are part of your personal brand and the agency's reputation.
+            </p>
+          </div>
+          <div className="standards-grid">
+            {[
+              ['01', 'Punctuality', 'Arrive on time for all castings, training sessions, fittings, and confirmed bookings.'],
+              ['02', 'Professional Conduct', 'Treat clients, photographers, designers, agency staff, and fellow models with respect.'],
+              ['03', 'Personal Presentation', 'Maintain appropriate grooming, hygiene, health, and clean professional appearance.'],
+              ['04', 'Communication', 'Respond promptly and communicate clearly with agency management at all times.'],
+              ['05', 'Commitment', 'Attend scheduled training, castings, rehearsals, and assignments responsibly.'],
+              ['06', 'Confidentiality', 'Respect confidential information relating to clients, campaigns, and agency activities.'],
+              ['07', 'Social Media', 'Maintain responsible online conduct that reflects positively on your professional engagements.'],
+              ['08', 'Bookings', 'Follow agency procedures regarding bookings, availability, and client communication.'],
+              ['09', 'Honesty', 'Provide accurate personal information and disclose relevant details whenever required.'],
+              ['10', 'Teamwork', 'Respect other models and contribute positively to the Trendie Models community.'],
+            ].map(([num, title, desc]) => (
+              <div className="standard-card" key={num}>
+                <span>{num}</span>
+                <div>
+                  <h4>{title}</h4>
+                  <p>{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 07 MEET THE LEADERSHIP TEAM */}
+        <section id="team" className="team-section">
+          <div className="wrap">
+            <p className="section-kicker">07 — LEADERSHIP</p>
+            <h2>Meet the Team<br/><em>Behind Trendie Models</em></h2>
+            <p style={{ maxWidth: '580px', color: '#67746c', fontSize: '13.5px', lineHeight: '1.8', margin: '14px 0 0' }}>
+              The people behind Trendie Models Ghana — dedicated to building exceptional talent and a credible, world-class creative platform.
+            </p>
+            <div className="team-grid">
+              <div className="team-card">
+                <div className="team-avatar">LKA</div>
+                <div className="team-info">
+                  <h3>Legon Kwesi Arthur</h3>
+                  <span className="team-role">Founder / CEO</span>
+                  <p>
+                    Responsible for the overall vision, strategy, creative partnerships, and growth of Trendie Models Ghana.
+                  </p>
+                </div>
+              </div>
+              <div className="team-card">
+                <div className="team-avatar">M</div>
+                <div className="team-info">
+                  <h3>MAGDALENE</h3>
+                  <span className="team-role">Operations / Management</span>
+                  <p>
+                    Responsible for talent coordination, model administration, bookings workflow, and day-to-day agency operations.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 08 CONTACT & CALL FOR MODELS */}
+        <section id="contact" className="contact-section">
+          <div className="wrap contact-grid">
+            <div>
+              <p className="section-kicker">08 — YOUR NEXT CHAPTER</p>
+              <h2>Ready to take your<br/><em>talent further?</em></h2>
+              <div className="requirements-callout" style={{ margin: '22px 0 0' }}>
+                <span className="req-tag">Requirements</span>
+                <span className="req-text">Females · Ages 18–30 · All Nationalities · All Heights Welcome</span>
+              </div>
+            </div>
+            <div>
+              <p>
+                Whether you are applying for representation or inquiring about booking our models for upcoming campaigns, our management team is here to assist.
+              </p>
+              <div className="contact-numbers">
+                <a href="mailto:hellotrendie@gmail.com" className="contact-phone-item">
+                  <Mail size={16}/> hellotrendie@gmail.com
+                </a>
+                <a href="https://wa.me/233267730824" target="_blank" rel="noreferrer" className="contact-phone-item">
+                  <span className="whatsapp-pill">WhatsApp</span> +233 26 773 0824
+                </a>
+                <a href="https://wa.me/233537298655" target="_blank" rel="noreferrer" className="contact-phone-item">
+                  <span className="whatsapp-pill">WhatsApp</span> +233 53 729 8655
+                </a>
+                <span className="contact-phone-item" style={{ color: '#68756d', fontSize: '12px' }}>
+                  Additional lines: 0205701711 · +1 334 578 5158
+                </span>
+              </div>
+              <Link href="/sign-up" className="button button-primary">
+                Submit model application <ArrowRight size={16}/>
+              </Link>
+              <p className="contact-small">
+                Trendie Models Ghana — Where Talent Meets Opportunity · Accra, Ghana
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="public-footer wrap">
+        <Brand />
+        <p>Where Talent Meets Opportunity · Accra • Ghana</p>
+        <div>
+          <Link href="/sign-up">Apply to join</Link>
+          <Link href="/sign-in">Member sign in</Link>
+          <a href="mailto:hellotrendie@gmail.com">hellotrendie@gmail.com</a>
+        </div>
+        <small>© {new Date().getFullYear()} TRENDIE MODELS GHANA · ACCRA, GHANA · ALL RIGHTS RESERVED</small>
+      </footer>
+    </div>
+  );
 }
 
 export function AuthPage({ mode }: { mode: 'sign-in' | 'sign-up' | 'forgot-password' | 'reset-password' }) {
