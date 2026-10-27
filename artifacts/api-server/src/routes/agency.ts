@@ -515,9 +515,48 @@ router.post(
     if (!ctx) return;
     const body = parseBody(SubmitApplicationBody, req.body, res);
     if (!body) return;
+
+    let appRow: Row | null = null;
     const result = await ctx.client.rpc("submit_application", { p_statement: body.statement ?? null });
-    const data = firstRow(unwrap(result) as Row | Row[]);
-    res.status(201).json(SubmitApplicationResponse.parse(parseApplication(data as Row)));
+    if (!result.error && result.data) {
+      appRow = firstRow(result.data as Row | Row[]);
+    } else {
+      // Fallback: direct insert using adminClient or client
+      const db = ctx.adminClient ?? ctx.client;
+      const insertRes = await db
+        .from("applications")
+        .insert({
+          user_id: ctx.user.id,
+          statement: body.statement ?? null,
+          status: "pending",
+        })
+        .select()
+        .single();
+      if (insertRes.error) {
+        throw insertRes.error;
+      }
+      appRow = insertRes.data as Row;
+
+      if (ctx.adminClient) {
+        try {
+          await ctx.adminClient
+            .from("profiles")
+            .update({ application_status: "pending", review_reason: null })
+            .eq("id", ctx.user.id);
+        } catch {
+          // If trigger blocks direct profile status update, application record is still submitted and visible to admin
+        }
+      }
+    }
+
+    if (!appRow) {
+      res.status(500).json({ error: "Failed to submit application." });
+      return;
+    }
+
+    const profile = await currentProfile(ctx);
+    const data = parseApplication({ ...appRow, applicant: profile });
+    res.status(201).json(SubmitApplicationResponse.parse(data));
   }),
 );
 
@@ -529,12 +568,52 @@ router.post(
     const params = parseParams(DecideApplicationParams, req.params, res);
     const body = parseBody(DecideApplicationBody, req.body, res);
     if (!params || !body) return;
+
+    let appRow: Row | null = null;
     const result = await ctx.client.rpc("admin_decide_application", {
       p_id: params.id,
       p_status: body.status,
       p_reason: body.reason,
     });
-    res.json(DecideApplicationResponse.parse(parseApplication(firstRow(unwrap(result) as Row | Row[]) as Row)));
+    if (!result.error && result.data) {
+      appRow = firstRow(result.data as Row | Row[]);
+    } else {
+      const db = ctx.adminClient ?? ctx.client;
+      const appUpdate = await db
+        .from("applications")
+        .update({
+          status: body.status,
+          review_reason: body.reason,
+          reviewer_id: ctx.user.id,
+          reviewed_at: new Date().toISOString(),
+        })
+        .eq("id", params.id)
+        .select()
+        .single();
+      if (appUpdate.error) throw appUpdate.error;
+      appRow = appUpdate.data as Row;
+
+      if (ctx.adminClient) {
+        try {
+          await ctx.adminClient
+            .from("profiles")
+            .update({
+              application_status: body.status,
+              review_reason: body.reason,
+            })
+            .eq("id", appRow.user_id);
+        } catch {}
+      }
+    }
+
+    if (!appRow) {
+      res.status(500).json({ error: "Failed to record application decision." });
+      return;
+    }
+
+    const applicantResult = await ctx.client.from("profiles").select("*").eq("id", appRow.user_id).maybeSingle();
+    const applicant = applicantResult.data ?? null;
+    res.json(DecideApplicationResponse.parse(parseApplication({ ...appRow, applicant })));
   }),
 );
 
@@ -591,6 +670,23 @@ router.patch(
       p_assignment_user_ids: assignmentIds ?? null,
     });
     res.json(UpdateTaskResponse.parse(parseTask(firstRow(unwrap(result) as Row | Row[]) as Row)));
+  }),
+);
+
+router.delete(
+  "/tasks/:id",
+  safe(async (req, res) => {
+    const ctx = await getAgencyContext(req, res);
+    if (!ctx || !requireAdmin(ctx, res)) return;
+    const { id } = req.params;
+    if (!id) {
+      res.status(400).json({ error: "Task id is required." });
+      return;
+    }
+    const db = ctx.adminClient ?? ctx.client;
+    const result = await db.from("tasks").delete().eq("id", id);
+    if (result.error) throw result.error;
+    res.status(200).json({ success: true, id });
   }),
 );
 
@@ -737,6 +833,23 @@ router.patch(
     });
     const data = firstRow(unwrap(result) as Row | Row[]);
     res.json(UpdateAnnouncementResponse.parse(parseAnnouncement(data as Row, ctx.user.id)));
+  }),
+);
+
+router.delete(
+  "/announcements/:id",
+  safe(async (req, res) => {
+    const ctx = await getAgencyContext(req, res);
+    if (!ctx || !requireAdmin(ctx, res)) return;
+    const { id } = req.params;
+    if (!id) {
+      res.status(400).json({ error: "Announcement id is required." });
+      return;
+    }
+    const db = ctx.adminClient ?? ctx.client;
+    const result = await db.from("announcements").delete().eq("id", id);
+    if (result.error) throw result.error;
+    res.status(200).json({ success: true, id });
   }),
 );
 

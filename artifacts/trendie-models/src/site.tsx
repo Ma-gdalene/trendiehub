@@ -5,7 +5,7 @@ import {
   Activity, ArrowRight, ArrowUpRight, Bell, BookOpen, Camera, Check, CheckCircle2, ChevronRight,
   CircleAlert, CircleHelp, ClipboardList, Clock3, FileText, ImagePlus, LayoutDashboard, LogOut,
   Mail, Menu, MessageCircle, Plus, RefreshCw, Search, Send, Settings, ShieldCheck, Sparkles,
-  Target, Trophy, Users, X, Droplets, CalendarDays, UserRound, Inbox, ExternalLink,
+  Target, Trophy, Users, X, Droplets, CalendarDays, UserRound, Inbox, ExternalLink, Trash2,
 } from 'lucide-react';
 import {
   useGetProfile, useGetDashboard, useListModels, useListApplications, useSubmitApplication,
@@ -45,6 +45,8 @@ function Brand({ light = false }: { light?: boolean }) { return <Link href="/" c
 function Button({ children, variant = 'primary', className = '', ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'outline' | 'secondary' | 'quiet' }) { return <button className={`button button-${variant} ${className}`} {...props}>{children}</button>; }
 
 export function PublicHome() {
+  const auth = useContext(AuthContext);
+  const [, go] = useLocation();
   return (
     <div className="landing">
       <header className="public-nav wrap">
@@ -60,8 +62,26 @@ export function PublicHome() {
           <a href="#contact">Contact</a>
         </nav>
         <div className="nav-actions">
-          <Link href="/sign-in" className="nav-signin">Sign in</Link>
-          <Link href="/sign-up" className="button button-primary">Join the agency <ArrowRight size={16}/></Link>
+          {auth.userId ? (
+            <>
+              <Link href="/dashboard" className="button button-outline">Dashboard</Link>
+              <button
+                type="button"
+                className="nav-signout-btn"
+                onClick={async () => {
+                  await supabase?.auth.signOut();
+                  go('/');
+                }}
+              >
+                <LogOut size={15}/> <span>Sign out</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/sign-in" className="nav-signin">Sign in</Link>
+              <Link href="/sign-up" className="button button-primary">Join the agency <ArrowRight size={16}/></Link>
+            </>
+          )}
         </div>
       </header>
 
@@ -540,7 +560,7 @@ export function ProtectedPage({ path }: { path: string }) {
   const admin = profile.role === 'admin';
   if (!admin && ['/models','/applications','/audit-logs'].includes(path)) return <div className="standalone-state"><EmptyState title="This space is for the agency team." body="Your member dashboard is ready for you." action={<Link href="/dashboard" className="button button-primary">Back to overview</Link>}/></div>;
   const currentTitle = routeTitles[path] || 'Agency space';
-  return <div className="app-shell"><aside className={`sidebar ${open ? 'sidebar-open' : ''}`}><div className="sidebar-brand"><Brand light/><button className="mobile-close" onClick={() => setOpen(false)} aria-label="Close navigation"><X/></button></div><div className="sidebar-kicker">{admin ? 'AGENCY CONSOLE' : 'MEMBER SPACE'}</div><nav className="side-nav">{(admin ? adminNav : modelNav).map(([label, href, Icon]) => <Link href={href} key={href} className={`side-link ${path === href || (path === '/leaderboard' && href === '/points') ? 'side-link-active' : ''}`} onClick={() => setOpen(false)}><Icon size={18}/><span>{label}</span></Link>)}</nav><div className="sidebar-bottom"><div className="sidebar-help"><CircleHelp/><div><b>Need a hand?</b><small>Our team is here for you.</small></div><Link href="/support"><ArrowUpRight size={16}/></Link></div><div className="user-mini"><span className="avatar">{initials(profile.full_name)}</span><div className="user-mini-text"><b>{profile.full_name || 'Member'}</b><small>{admin ? 'Agency admin' : 'Agency member'}</small></div><button aria-label="Sign out" onClick={async () => { await supabase?.auth.signOut(); go('/'); }}><LogOut size={16}/></button></div></div></aside>{open && <button className="mobile-scrim" onClick={() => setOpen(false)} aria-label="Close menu"/>}<div className="main-column"><header className="app-topbar"><button className="mobile-menu" onClick={() => setOpen(true)} aria-label="Open menu"><Menu/></button><div className="breadcrumb"><span>Agency space</span><ChevronRight size={14}/><b>{currentTitle}</b></div><div className="topbar-tools"><span className="today-label">{new Date().toLocaleDateString('en-GH',{weekday:'short',month:'short',day:'numeric'})}</span><Link href="/notifications" className="top-icon"><Bell size={18}/></Link><Link href="/profile" className="top-avatar">{initials(profile.full_name)}</Link></div></header><main className="page-content"><RouteScreen path={path} profile={profile} admin={admin}/></main></div></div>;
+  return <div className="app-shell"><aside className={`sidebar ${open ? 'sidebar-open' : ''}`}><div className="sidebar-brand"><Brand light/><button className="mobile-close" onClick={() => setOpen(false)} aria-label="Close navigation"><X/></button></div><div className="sidebar-kicker">{admin ? 'AGENCY CONSOLE' : 'MEMBER SPACE'}</div><nav className="side-nav">{(admin ? adminNav : modelNav).map(([label, href, Icon]) => <Link href={href} key={href} className={`side-link ${path === href || (path === '/leaderboard' && href === '/points') ? 'side-link-active' : ''}`} onClick={() => setOpen(false)}><Icon size={18}/><span>{label}</span></Link>)}</nav><div className="sidebar-bottom"><div className="sidebar-help"><CircleHelp/><div><b>Need a hand?</b><small>Our team is here for you.</small></div><Link href="/support"><ArrowUpRight size={16}/></Link></div><div className="user-mini"><span className="avatar">{initials(profile.full_name)}</span><div className="user-mini-text"><b>{profile.full_name || 'Member'}</b><small>{admin ? 'Agency admin' : 'Agency member'}</small></div></div><button type="button" className="sidebar-signout-row" onClick={async () => { await supabase?.auth.signOut(); go('/'); }}><LogOut size={16}/><span>Sign out</span></button></div></aside>{open && <button className="mobile-scrim" onClick={() => setOpen(false)} aria-label="Close menu"/>}<div className="main-column"><header className="app-topbar"><button className="mobile-menu" onClick={() => setOpen(true)} aria-label="Open menu"><Menu/></button><div className="breadcrumb"><span>Agency space</span><ChevronRight size={14}/><b>{currentTitle}</b></div><div className="topbar-tools"><span className="today-label">{new Date().toLocaleDateString('en-GH',{weekday:'short',month:'short',day:'numeric'})}</span><Link href="/notifications" className="top-icon" title="Notifications"><Bell size={18}/></Link><Link href="/profile" className="top-avatar" title="My profile">{initials(profile.full_name)}</Link><button type="button" className="topbar-signout-btn" onClick={async () => { await supabase?.auth.signOut(); go('/'); }} title="Sign out"><LogOut size={15}/><span>Sign out</span></button></div></header><main className="page-content"><RouteScreen path={path} profile={profile} admin={admin}/></main></div></div>;
 }
 
 function RouteScreen({ path, profile, admin }: { path: string; profile: AgencyProfile; admin: boolean }) {
@@ -625,8 +645,16 @@ function Profile({ profile }: { profile: AgencyProfile }) {
   const application = (e: FormEvent) => {
     e.preventDefault();
     submitApp.mutate({ data: { statement: statement.trim() || null } }, {
-      onSuccess: () => { qc.invalidateQueries({ queryKey: getGetProfileQueryKey() }); qc.invalidateQueries({ queryKey: getListApplicationsQueryKey() }); setNotice('Your application has been sent to our review team.'); },
-      onError: () => setNotice('Your application could not be submitted. Please try again.'),
+      onSuccess: () => {
+        qc.invalidateQueries({ queryKey: getGetProfileQueryKey() });
+        qc.invalidateQueries({ queryKey: getListApplicationsQueryKey() });
+        qc.invalidateQueries({ queryKey: getGetDashboardQueryKey() });
+        setNotice('Your application has been successfully submitted to the TRENDIE MODELS review team! Our team will review your portfolio and details.');
+      },
+      onError: (err: unknown) => {
+        const errorObj = err as { message?: string; error?: string };
+        setNotice(errorObj?.message || errorObj?.error || 'Your application could not be submitted. Please check that your details are saved and try again.');
+      },
     });
   };
   return <>
@@ -831,6 +859,25 @@ function Tasks({ admin, modelId }: { admin: boolean; modelId: string }) {
     setCreateOpen(true);
   };
   const closeTaskForm = () => { setCreateOpen(false); setEditingTask(null); setForm(emptyForm); };
+  const deleteTask = async (id: string, title: string) => {
+    if (!window.confirm(`Permanently delete task “${title}”? This will remove all assignees and submissions. This cannot be undone.`)) return;
+    try {
+      const session = (await supabase?.auth.getSession())?.data.session;
+      const token = session?.access_token;
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+      const res = await fetch(`${baseUrl}/api/tasks/${id}`, {
+        method: 'DELETE',
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to delete task');
+      }
+      invalidate();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Could not delete task.');
+    }
+  };
   const saveTask = (e: FormEvent) => {
     e.preventDefault();
     const deadline = form.deadline ? new Date(`${form.deadline}T23:59:59`).toISOString() : null;
@@ -900,7 +947,7 @@ function Tasks({ admin, modelId }: { admin: boolean; modelId: string }) {
          {submission && <div className="submission-preview"><b>Submission</b><p>{submission.notes || 'Evidence submitted for review.'}</p>{submission.status && <Pill status={submission.status}/>}<div className="evidence-list">{submission.evidence_paths?.map((path) => <SignedEvidence key={path} path={path}/>)}</div>{submission.review_note && <p className="review-feedback"><b>Agency feedback:</b> {submission.review_note}</p>}</div>}
         {!admin && canSubmit(task) && <form className="inline-submit task-submit-form" onSubmit={e => submitTask(task, e)}><Field label="Submission notes"><textarea value={taskId === taskKey ? notes : ''} onChange={e => { setTaskId(taskKey); setNotes(e.target.value); }} rows={2} placeholder="Add context for your submission"/></Field><label className="task-upload"><input type="file" multiple accept="image/jpeg,image/png,image/webp,application/pdf" onChange={e => { setTaskId(taskKey); setEvidenceFiles(Array.from(e.target.files || [])); setUploadNotice(''); }}/><span><ImagePlus size={15}/> Attach evidence</span><small>{taskId === taskKey && evidenceFiles.length ? evidenceFiles.map(f => f.name).join(', ') : 'Images or PDF · 10 MB max each'}</small></label>{taskId === taskKey && uploadNotice && <p className="upload-feedback" role="status">{uploadNotice}</p>}{uploadBusy && <progress className="upload-progress"/>}<Button disabled={submit.isPending || uploadBusy || !task.assignment_id}>{uploadBusy ? 'Uploading…' : submit.isPending ? 'Submitting…' : 'Submit task'} <ArrowRight size={15}/></Button></form>}
         {admin && task.assignment_status === 'submitted' && <form className="inline-submit review-form" onSubmit={e => reviewTask(task, e)}><Field label="Review note"><input required maxLength={1000} value={taskId === taskKey ? reviewNote : ''} onChange={e => { setTaskId(taskKey); setReviewNote(e.target.value); }} placeholder="Feedback for this model"/></Field><Field label="Points"><input type="number" min="0" max="10000" value={taskId === taskKey ? reviewPoints : ''} onChange={e => { setTaskId(taskKey); setReviewPoints(e.target.value); }}/></Field><select value={reviewStatus} onChange={e => setReviewStatus(e.target.value as 'approved' | 'rejected')}><option value="approved">Approve</option><option value="rejected">Request changes</option></select><Button disabled={review.isPending}>Save review</Button></form>}
-        {admin && <div className="task-admin-controls"><Button variant="quiet" onClick={() => editTask(task)}>Edit task</Button>{task.status !== 'completed' && task.status !== 'cancelled' && <Button variant="quiet" onClick={() => { if (window.confirm(`Cancel “${task.title}” for its remaining assignees?`)) update.mutate({ id: task.id, data: { status: 'cancelled' } }, { onSuccess: invalidate }); }}>Cancel task</Button>}</div>}
+        {admin && <div className="task-admin-controls"><Button variant="quiet" onClick={() => editTask(task)}>Edit task</Button>{task.status !== 'completed' && task.status !== 'cancelled' && <Button variant="quiet" onClick={() => { if (window.confirm(`Cancel “${task.title}” for its remaining assignees?`)) update.mutate({ id: task.id, data: { status: 'cancelled' } }, { onSuccess: invalidate }); }}>Cancel task</Button>}<Button variant="quiet" className="delete-btn" onClick={() => deleteTask(task.id, task.title)}><Trash2 size={14}/> Delete</Button></div>}
       </article>;
     })}</div> : <EmptyState title={admin ? 'No tasks have been assigned yet.' : 'Nothing on your task list.'} body={admin ? 'Create a task when the team has a clear goal for members.' : 'When the agency assigns you something, it will appear here.'} action={admin ? <Button onClick={() => { setEditingTask(null); setForm(emptyForm); setCreateOpen(true); }}><Plus size={16}/> Create a task</Button> : undefined}/>}
     {createOpen && <div className="modal-backdrop"><form className="modal modal-wide" onSubmit={saveTask}><button type="button" className="modal-close" onClick={closeTaskForm} aria-label="Close"><X/></button><p className="section-kicker">{editingTask ? 'EDIT ASSIGNMENT' : 'NEW ASSIGNMENT'}</p><h2>{editingTask ? 'Keep the next step clear.' : 'Make the next step clear.'}</h2><div className="form-grid"><Field label="Task title"><input required minLength={2} maxLength={160} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}/></Field><Field label="Priority"><select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })}><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option><option value="urgent">Urgent</option></select></Field><Field label="Description"><textarea required maxLength={4000} rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}/></Field><Field label="Instructions (optional)"><textarea maxLength={4000} rows={3} value={form.instructions} onChange={e => setForm({ ...form, instructions: e.target.value })}/></Field><Field label="Deadline"><input type="date" value={form.deadline} onChange={e => setForm({ ...form, deadline: e.target.value })}/></Field><Field label="Assign approved models"><select multiple size={5} value={form.assignment_user_ids} onChange={e => setForm({ ...form, assignment_user_ids: Array.from(e.target.selectedOptions, option => option.value) })} disabled={models.isLoading || models.isError}>{models.data?.map(model => <option value={model.id} key={model.id}>{model.full_name} · {model.email}</option>)}</select><small>Select one or several models. Leave empty to save a draft task without assignees.</small></Field></div>{models.isError && <p className="form-notice" role="alert">Approved members could not be loaded, so assignments cannot be selected. Try again after the roster is available.</p>}<div className="modal-actions"><Button type="button" variant="outline" onClick={closeTaskForm}>Cancel</Button><Button disabled={create.isPending || update.isPending || models.isError}>{create.isPending || update.isPending ? 'Saving…' : editingTask ? 'Save changes' : 'Create task'} <ArrowRight size={15}/></Button></div></form></div>}
@@ -929,15 +976,35 @@ function Announcements({ admin }: { admin:boolean }) {
   const [form,setForm]=useState(emptyForm);
   useEffect(()=>{const client=supabase;if(!client)return;const channel=client.channel('agency-announcements').on('postgres_changes',{event:'*',schema:'public',table:'announcements'},()=>{void qc.invalidateQueries({queryKey:getListAnnouncementsQueryKey()});void qc.invalidateQueries({queryKey:getGetDashboardQueryKey()});}).subscribe();return()=>{void client.removeChannel(channel);};},[qc]);
   const reset=()=>{setOpen(false);setEditing(null);setForm(emptyForm);setNotice('');};
+  const deleteAnnouncement = async (id: string, title: string) => {
+    if (!window.confirm(`Permanently delete announcement “${title}”? This cannot be undone.`)) return;
+    try {
+      const session = (await supabase?.auth.getSession())?.data.session;
+      const token = session?.access_token;
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+      const res = await fetch(`${baseUrl}/api/announcements/${id}`, {
+        method: 'DELETE',
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to delete announcement');
+      }
+      qc.invalidateQueries({ queryKey: getListAnnouncementsQueryKey() });
+      qc.invalidateQueries({ queryKey: getGetDashboardQueryKey() });
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Could not delete announcement.');
+    }
+  };
   const openNew=()=>{setEditing(null);setForm(emptyForm);setNotice('');setOpen(true);};
   const save=(e:FormEvent)=>{e.preventDefault();if(form.audience==='selected'&&form.recipient_ids.length===0){setNotice('Choose at least one approved member for this announcement.');return;}const data={...form,title:form.title.trim(),body:form.body.trim(),status:form.status as 'draft'|'published',audience:form.audience as 'all'|'selected'};const onSuccess=()=>{void qc.invalidateQueries({queryKey:getListAnnouncementsQueryKey()});reset();};const onError=()=>setNotice('The announcement could not be saved. Please try again.');if(editing)update.mutate({id:editing,data},{onSuccess,onError});else create.mutate({data},{onSuccess,onError});};
-  return <><PageTitle eyebrow={admin?'COMMUNITY COMMS':'AGENCY BULLETIN'} title="Announcements" description={admin?'Keep the agency connected with clear, timely updates.':'News and notes from the TRENDIE MODELS team.'} action={admin?<Button onClick={openNew}><Plus size={16}/> New announcement</Button>:undefined}/>{q.isLoading?<LoadingState/>:q.isError?<ErrorState retry={()=>q.refetch()}/>:q.data?.length?<div className="announcement-list">{q.data.map(a=><article className="panel announcement-card" key={a.id}><div className="announcement-card-top"><span className="announcement-mark"><BookOpen/></span><Pill status={a.status}/><small>{fmt(a.published_at||a.created_at)}</small></div><h2>{a.title}</h2><p>{a.body}</p><div className="announcement-card-foot">{!admin&&!a.is_read&&<Button variant="outline" onClick={()=>mark.mutate({id:a.id},{onSuccess:()=>qc.invalidateQueries({queryKey:getListAnnouncementsQueryKey()})})}>Mark as read <Check size={14}/></Button>}{admin&&<div className="announcement-admin"><span>Audience: {a.audience === 'selected' ? `${a.recipient_ids?.length || 0} selected members` : 'All members'}</span><Button variant="quiet" onClick={()=>{setEditing(a.id);setForm({title:a.title,body:a.body,status:a.status==='archived'?'draft':a.status,audience:a.audience,recipient_ids:a.recipient_ids||[]});setNotice('');setOpen(true);}}>Edit</Button>{a.status!=='archived'&&<Button variant="quiet" onClick={()=>{if(window.confirm(`Archive “${a.title}”?`))update.mutate({id:a.id,data:{status:'archived'}},{onSuccess:()=>qc.invalidateQueries({queryKey:getListAnnouncementsQueryKey()}),onError:()=>setNotice('This announcement could not be archived. Please try again.')});}}>Archive</Button>}</div>}</div></article>)}</div>:<EmptyState title="No announcements yet." body={admin?'When the team shares an update, it will appear here.':'When the agency has news to share, it will appear here.'} action={admin?<Button onClick={openNew}><Plus size={15}/> Write an update</Button>:undefined}/>}
+  return <><PageTitle eyebrow={admin?'COMMUNITY COMMS':'AGENCY BULLETIN'} title="Announcements" description={admin?'Keep the agency connected with clear, timely updates.':'News and notes from the TRENDIE MODELS team.'} action={admin?<Button onClick={openNew}><Plus size={16}/> New announcement</Button>:undefined}/>{q.isLoading?<LoadingState/>:q.isError?<ErrorState retry={()=>q.refetch()}/>:q.data?.length?<div className="announcement-list">{q.data.map(a=><article className="panel announcement-card" key={a.id}><div className="announcement-card-top"><span className="announcement-mark"><BookOpen/></span><Pill status={a.status}/><small>{fmt(a.published_at||a.created_at)}</small></div><h2>{a.title}</h2><p>{a.body}</p><div className="announcement-card-foot">{!admin&&!a.is_read&&<Button variant="outline" onClick={()=>mark.mutate({id:a.id},{onSuccess:()=>qc.invalidateQueries({queryKey:getListAnnouncementsQueryKey()})})}>Mark as read <Check size={14}/></Button>}{admin&&<div className="announcement-admin"><span>Audience: {a.audience === 'selected' ? `${a.recipient_ids?.length || 0} selected members` : 'All members'}</span><Button variant="quiet" onClick={()=>{setEditing(a.id);setForm({title:a.title,body:a.body,status:a.status==='archived'?'draft':a.status,audience:a.audience,recipient_ids:a.recipient_ids||[]});setNotice('');setOpen(true);}}>Edit</Button>{a.status!=='archived'&&<Button variant="quiet" onClick={()=>{if(window.confirm(`Archive “${a.title}”?`))update.mutate({id:a.id,data:{status:'archived'}},{onSuccess:()=>qc.invalidateQueries({queryKey:getListAnnouncementsQueryKey()}),onError:()=>setNotice('This announcement could not be archived. Please try again.')});}}>Archive</Button>}<Button variant="quiet" className="delete-btn" onClick={()=>deleteAnnouncement(a.id, a.title)}><Trash2 size={14}/> Delete</Button></div>}</div></article>)}</div>:<EmptyState title="No announcements yet." body={admin?'When the team shares an update, it will appear here.':'When the agency has news to share, it will appear here.'} action={admin?<Button onClick={openNew}><Plus size={15}/> Write an update</Button>:undefined}/>}
     {open&&<div className="modal-backdrop"><form className="modal modal-wide" onSubmit={save}><button type="button" className="modal-close" onClick={reset} aria-label="Close"><X/></button><p className="section-kicker">AGENCY BULLETIN</p><h2>{editing?'Edit announcement':'Share an update.'}</h2><Field label="Headline"><input required minLength={2} maxLength={160} value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/></Field><Field label="Message"><textarea required minLength={2} maxLength={8000} rows={6} value={form.body} onChange={e=>setForm({...form,body:e.target.value})}/></Field><div className="form-grid"><Field label="Status"><select value={form.status} onChange={e=>setForm({...form,status:e.target.value})}><option value="published">Publish now</option><option value="draft">Save draft</option></select></Field><Field label="Audience"><select value={form.audience} onChange={e=>setForm({...form,audience:e.target.value})}><option value="all">All members</option><option value="selected">Selected members</option></select></Field></div>{form.audience==='selected'&&<Field label="Recipients (approved models)"><select multiple size={5} value={form.recipient_ids} disabled={models.isLoading||models.isError} onChange={e=>setForm({...form,recipient_ids:Array.from(e.target.selectedOptions,o=>o.value)})}>{models.data?.map(model=><option value={model.id} key={model.id}>{model.full_name} · {model.email}</option>)}</select></Field>}{models.isError&&form.audience==='selected'&&<p className="form-notice" role="alert">The approved-model list could not be loaded.</p>}{notice&&<p className="form-notice" role="alert">{notice}</p>}<div className="modal-actions"><Button variant="outline" type="button" onClick={reset}>Cancel</Button><Button disabled={create.isPending||update.isPending||(form.audience==='selected'&&models.isError)}>{create.isPending||update.isPending?'Saving…':'Save announcement'} <ArrowRight size={15}/></Button></div></form></div>}</>;
 }
 
 function Messages({ profile, admin }: { profile:AgencyProfile; admin:boolean }) {
   const qc=useQueryClient(); const conv=useListConversations();
-  const models=useListModels({status:'approved'},{query:{enabled:admin,queryKey:getListModelsQueryKey({status:'approved'})}});
+  const models=useListModels({status:'all'},{query:{enabled:admin,queryKey:getListModelsQueryKey({status:'all'})}});
   const agencyAdmins=useListAgencyAdmins({query:{enabled:!admin,queryKey:getListAgencyAdminsQueryKey()}});
   const [selected,setSelected]=useState(()=>new URLSearchParams(window.location.search).get('conversation')||''); const [body,setBody]=useState(''); const [recipient,setRecipient]=useState(''); const [title,setTitle]=useState(''); const [firstMessage,setFirstMessage]=useState(''); const [notice,setNotice]=useState('');
   const create=useCreateConversation(); const send=useSendMessage(); const messageQuery=useListMessages(selected,{query:{enabled:!!selected,queryKey:getListMessagesQueryKey(selected)}});
@@ -946,11 +1013,15 @@ function Messages({ profile, admin }: { profile:AgencyProfile; admin:boolean }) 
   useEffect(()=>{if(selected&&messageQuery.data)void qc.invalidateQueries({queryKey:getListConversationsQueryKey()});},[selected,messageQuery.data,qc]);
   const start=(e:FormEvent)=>{e.preventDefault();if(!recipient){setNotice('Choose an available contact first.');return;}setNotice('');create.mutate({data:{recipient_id:recipient,title:title.trim()||null,initial_message:firstMessage.trim()}},{onSuccess:c=>{void qc.invalidateQueries({queryKey:getListConversationsQueryKey()});setSelected(c.id);setRecipient('');setTitle('');setFirstMessage('');},onError:()=>setNotice('The conversation could not be started. Please try again.')});};
   const sendMessage=(e:FormEvent)=>{e.preventDefault();if(!selected||!body.trim())return;send.mutate({id:selected,data:{body:body.trim()}},{onSuccess:()=>{void qc.invalidateQueries({queryKey:getListMessagesQueryKey(selected)});void qc.invalidateQueries({queryKey:getListConversationsQueryKey()});void qc.invalidateQueries({queryKey:getGetDashboardQueryKey()});setBody('');setNotice('');},onError:()=>setNotice('Your message could not be sent. Please try again.')});};
-  const options=admin?(models.data||[]).map(model=>({id:model.id,name:model.full_name||model.email})):(agencyAdmins.data||[]).map(person=>({id:person.id,name:person.full_name||'TRENDIE MODELS team'}));
+  const formatModelLabel=(m:AgencyProfile)=>{
+    const statusLabel = m.application_status === 'approved' ? 'Approved' : m.application_status === 'pending' ? 'Applicant (Pending)' : m.application_status === 'rejected' ? 'Applicant (Declined)' : 'Applicant';
+    return `${m.full_name || m.email} · ${statusLabel}`;
+  };
+  const options=admin?(models.data||[]).map(model=>({id:model.id,name:formatModelLabel(model)})):(agencyAdmins.data||[]).map(person=>({id:person.id,name:person.full_name||'TRENDIE MODELS team'}));
   const directoryLoading=admin?models.isLoading:agencyAdmins.isLoading; const directoryError=admin?models.isError:agencyAdmins.isError;
   return <><PageTitle eyebrow="PRIVATE AGENCY CHANNEL" title="Messages" description="A private, real-time line between models and the TRENDIE MODELS team."/><div className="messages-layout"><aside className="panel conversation-list"><div className="conversation-head"><h2>Conversations</h2><span>{conv.data?.length||0}</span></div>{conv.isLoading?<LoadingState/>:conv.isError?<ErrorState retry={()=>conv.refetch()}/>:conv.data?.length?conv.data.map(c=><button className={`conversation-item ${selected===c.id?'conversation-selected':''}`} key={c.id} onClick={()=>setSelected(c.id)}><span className="avatar"><MessageCircle size={16}/></span><span><b>{c.title||'Agency conversation'}</b><small>{c.unread_count?`${c.unread_count} unread`:'No unread messages'}</small></span><ChevronRight size={16}/></button>):<EmptyState title="No conversations yet." body="A conversation will appear here when you or the agency starts one."/>}</aside>
     <section className="panel message-panel">{selected?<><div className="message-head"><span className="avatar"><MessageCircle size={16}/></span><div><b>{conv.data?.find(c=>c.id===selected)?.title||'Agency conversation'}</b><small>Private conversation</small></div></div><div className="message-thread">{messageQuery.isLoading?<LoadingState/>:messageQuery.isError?<ErrorState retry={()=>messageQuery.refetch()}/>:messages.length?messages.map(m=><div className={`message-bubble ${m.sender_id===profile.id?'message-mine':''}`} key={m.id}><p>{m.body}</p><small>{m.sender_id===profile.id?'You':'Agency team'} · {fmt(m.created_at)}</small></div>):<EmptyState title="A fresh conversation." body="Send a note to begin."/>}</div><form className="message-compose" onSubmit={sendMessage}><input required maxLength={4000} value={body} onChange={e=>setBody(e.target.value)} placeholder="Write a message to the agency…"/><Button aria-label="Send message" disabled={send.isPending}><Send size={17}/></Button></form></>:<div className="message-empty"><span><Inbox/></span><h2>Make room for a conversation.</h2><p>Select a thread or start a new private conversation.</p></div>}</section></div>
-    <form className="panel new-conversation" onSubmit={start}><div><p className="section-kicker">START A PRIVATE THREAD</p><h2>Send a first note</h2><p>{admin?'Start a one-to-one conversation with an approved model.':'Choose an agency contact for a private message.'}</p></div><div className="new-convo-fields"><Field label={admin?'Approved model':'Agency contact'}><select required value={recipient} onChange={e=>setRecipient(e.target.value)} disabled={directoryLoading||directoryError}><option value="">{directoryLoading?'Loading contacts…':'Choose a recipient'}</option>{options.map(person=><option value={person.id} key={person.id}>{person.name}</option>)}</select></Field><Field label="Subject (optional)"><input maxLength={160} value={title} onChange={e=>setTitle(e.target.value)} placeholder="What would you like to discuss?"/></Field><Field label="First message"><input required minLength={1} maxLength={4000} value={firstMessage} onChange={e=>setFirstMessage(e.target.value)} placeholder="Write your opening message"/></Field><Button disabled={create.isPending||directoryLoading||directoryError||options.length===0}>{create.isPending?'Starting…':'Start conversation'} <ArrowRight size={15}/></Button></div>{directoryError&&<p className="form-notice" role="alert">The contact list could not be loaded. Please refresh or contact the agency.</p>}{!directoryLoading&&!directoryError&&options.length===0&&<p className="quiet-line">No available contacts were found.</p>}{notice&&<p className="form-notice" role="alert">{notice}</p>}</form></>;
+    <form className="panel new-conversation" onSubmit={start}><div><p className="section-kicker">START A PRIVATE THREAD</p><h2>Send a first note</h2><p>{admin?'Start a one-to-one conversation with any applicant or approved model.':'Choose an agency contact for a private message.'}</p></div><div className="new-convo-fields"><Field label={admin?'Applicant or approved model':'Agency contact'}><select required value={recipient} onChange={e=>setRecipient(e.target.value)} disabled={directoryLoading||directoryError}><option value="">{directoryLoading?'Loading contacts…':'Choose a recipient'}</option>{options.map(person=><option value={person.id} key={person.id}>{person.name}</option>)}</select></Field><Field label="Subject (optional)"><input maxLength={160} value={title} onChange={e=>setTitle(e.target.value)} placeholder="What would you like to discuss?"/></Field><Field label="First message"><input required minLength={1} maxLength={4000} value={firstMessage} onChange={e=>setFirstMessage(e.target.value)} placeholder="Write your opening message"/></Field><Button disabled={create.isPending||directoryLoading||directoryError||options.length===0}>{create.isPending?'Starting…':'Start conversation'} <ArrowRight size={15}/></Button></div>{directoryError&&<p className="form-notice" role="alert">The contact list could not be loaded. Please refresh or contact the agency.</p>}{!directoryLoading&&!directoryError&&options.length===0&&<p className="quiet-line">No available contacts were found.</p>}{notice&&<p className="form-notice" role="alert">{notice}</p>}</form></>;
 }
 
 function Notifications({ userId }: { userId: string }) {

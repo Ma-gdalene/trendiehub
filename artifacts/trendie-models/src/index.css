@@ -803,3 +803,80 @@ tbody tr:last-child td { border-bottom:0; }.table-person { display:flex; align-i
   .tracker-form { padding:16px; }.form-footer { flex-direction:column; align-items:flex-start; }.form-footer .button { align-self:stretch; }.support-head { align-items:flex-start; }.support-head select { min-width:120px; min-height:34px; }.support-reply-form .button { padding:0 10px; }.audit-row { flex-wrap:wrap; padding:10px 0; }.audit-row time { margin-left:auto; }.audit-row details { margin-left:auto; }
   .protected-loading { display:block; padding:19px; }.shell-skeleton { display:none; }.modal-backdrop { padding:13px; }.modal { padding:23px 18px; max-height:calc(100dvh - 26px); }
 }
+
+/* Prominent Sign Out & Deletion Styles */
+.topbar-signout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(198, 155, 93, 0.14);
+  color: #13201a;
+  border: 1px solid rgba(198, 155, 93, 0.45);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 6px;
+}
+.topbar-signout-btn:hover {
+  background: #13201a;
+  color: #ffffff;
+  border-color: #13201a;
+}
+.sidebar-signout-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e5ece6;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.sidebar-signout-row:hover {
+  background: rgba(200, 60, 60, 0.22);
+  color: #ffb8b8;
+  border-color: rgba(200, 60, 60, 0.45);
+}
+.nav-signout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: #495b50;
+  border: 1px solid #dcd7cb;
+  padding: 7px 15px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.nav-signout-btn:hover {
+  background: #13201a;
+  color: #ffffff;
+  border-color: #13201a;
+}
+.delete-btn {
+  color: #c94436 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  transition: all 0.2s ease !important;
+}
+.delete-btn:hover {
+  background: rgba(201, 68, 54, 0.12) !important;
+  color: #a8271b !important;
+}
+

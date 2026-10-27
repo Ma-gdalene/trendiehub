@@ -10,11 +10,12 @@ type ProfileRow = Record<string, unknown> & {
 
 export type AgencyContext = {
   client: SupabaseClient;
+  adminClient?: SupabaseClient;
   user: User;
   profile: ProfileRow;
 };
 
-function getSupabaseConfig(): { url: string; anonKey: string; serviceRoleKey?: string } {
+export function getSupabaseConfig(): { url: string; anonKey: string; serviceRoleKey?: string } {
   const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? "https://hapjyuomrpakftoljlcf.supabase.co";
   const anonKey = process.env.SUPABASE_ANON_KEY ?? process.env.VITE_SUPABASE_ANON_KEY ?? "sb_publishable_GESWlsaY7eXe-heM1lDMiA_z5jtk7iY";
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -97,7 +98,18 @@ export async function getAgencyContext(
     return null;
   }
 
-  return { client, user, profile: activeProfile };
+  let adminClient: SupabaseClient | undefined;
+  if (config.serviceRoleKey) {
+    adminClient = createClient(config.url, config.serviceRoleKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    });
+  }
+
+  return { client, adminClient, user, profile: activeProfile };
 }
 
 export function requireAdmin(ctx: AgencyContext, res: Response): boolean {

@@ -239,9 +239,12 @@ returns boolean language sql stable security definer set search_path = public, p
 $$;
 
 create or replace function private.protect_profile_fields()
-returns trigger language plpgsql set search_path = public, pg_temp as $$
+returns trigger language plpgsql security definer set search_path = public, private, pg_temp as $$
 begin
   if auth.uid() = old.id and not private.is_admin() then
+    if (old.application_status in ('not_submitted', 'rejected') and new.application_status = 'pending' and new.review_reason is null) then
+      return new;
+    end if;
     if new.role is distinct from old.role
       or new.application_status is distinct from old.application_status
       or new.review_reason is distinct from old.review_reason
@@ -753,7 +756,8 @@ alter table public.support_requests enable row level security;
 alter table public.support_replies enable row level security;
 alter table public.audit_events enable row level security;
 
-grant usage on schema private to authenticated;
+grant usage on schema private to postgres, service_role, authenticated, anon;
+grant all on schema private to postgres, service_role;
 grant execute on function private.is_admin() to authenticated;
 grant execute on function private.is_active_model() to authenticated;
 grant execute on function private.is_active_user() to authenticated;

@@ -1,3 +1,8 @@
+if (typeof process.loadEnvFile === "function") {
+  try { process.loadEnvFile(".env"); } catch {}
+  try { process.loadEnvFile("../../.env"); } catch {}
+}
+
 import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";

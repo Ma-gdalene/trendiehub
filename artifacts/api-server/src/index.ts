@@ -1,3 +1,8 @@
+if (typeof process.loadEnvFile === "function") {
+  try { process.loadEnvFile(".env"); } catch {}
+  try { process.loadEnvFile("../../.env"); } catch {}
+}
+
 import app from "./app";
 import { logger } from "./lib/logger";
 
